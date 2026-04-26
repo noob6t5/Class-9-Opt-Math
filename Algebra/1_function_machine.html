@@ -1,221 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Domain & Range Learning Machine</title>
-<style>
-:root{
-    --primary:#2c3e50;
-    --accent:#f1c40f;
-    --success:#27ae60;
-    --danger:#e74c3c;
-}
+    <meta charset="UTF-8">
+    <title>Advanced Domain & Range Machine</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #f1c40f;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --secondary: #34495e;
+        }
 
-body{
-    font-family:Segoe UI;
-    background:#ecf0f1;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    margin:0;
-    padding:20px;
-}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
 
-.lesson{
-    text-align:center;
-    max-width:800px;
-    margin-bottom:20px;
-}
+        .lesson { text-align: center; max-width: 800px; margin-bottom: 20px; }
+        .highlight { color: var(--danger); font-weight: bold; }
 
-.lesson h2{color:var(--primary);}
-.highlight{color:var(--danger); font-weight:bold;}
+        #machine {
+            width: 360px;
+            height: 200px;
+            background: var(--primary);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            position: relative;
+            margin-top: 50px;
+            border: 4px solid var(--secondary);
+        }
 
-#machine{
-    width:360px;
-    height:240px;
-    background:var(--primary);
-    border-radius:15px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:white;
-    font-size:2rem;
-    position:relative;
-    margin-top:20px;
-}
+        #ball {
+            width: 80px;
+            height: 80px;
+            background: var(--accent);
+            border-radius: 50%;
+            position: absolute;
+            top: -120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #000;
+            font-size: 1rem;
+            opacity: 0;
+            z-index: 10;
+        }
 
-#ball{
-    width:80px;
-    height:80px;
-    background:var(--accent);
-    border-radius:50%;
-    position:absolute;
-    top:-120px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:bold;
-    opacity:0;
-}
+        /* Animation: Enters, stays briefly in machine, then exits and disappears */
+        .animate { animation: move 2.5s ease-in-out forwards; }
 
-.animate{animation:move 2.5s ease-in-out forwards;}
+        @keyframes move {
+            0% { top: -120px; opacity: 0; transform: scale(1); }
+            20% { top: -40px; opacity: 1; }
+            50% { top: 60px; opacity: 1; transform: scale(1.1); }
+            80% { top: 220px; opacity: 1; }
+            100% { top: 250px; opacity: 0; transform: scale(0.8); }
+        }
 
-@keyframes move{
-    0%{top:-120px;opacity:0;}
-    20%{top:-40px;opacity:1;}
-    50%{top:90px;}
-    80%{top:240px;}
-    100%{top:240px;opacity:1;}
-}
+        .controls { margin-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        input, button, select { padding: 12px; font-size: 1rem; border-radius: 5px; border: 1px solid #ccc; }
+        
+        button { background: var(--success); color: white; border: none; cursor: pointer; transition: 0.2s; }
+        button:hover { opacity: 0.9; }
+        button.quiz-btn { background: #8e44ad; }
 
-.controls{
-    margin-top:30px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:10px;
-}
+        #output { margin-top: 15px; font-weight: bold; color: var(--primary); min-height: 25px; font-style: italic; }
 
-input,button,select{
-    padding:10px;
-    font-size:1.1rem;
-}
-
-button{
-    background:var(--success);
-    color:white;
-    border:none;
-    cursor:pointer;
-}
-
-#output{
-    margin-top:10px;
-    font-weight:bold;
-    color:var(--danger);
-    min-height:25px;
-}
-
-.quizBox{
-    margin-top:20px;
-    padding:15px;
-    background:white;
-    border-radius:10px;
-    display:none;
-    text-align:center;
-}
-</style>
+        .quizBox {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            display: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 320px;
+        }
+    </style>
 </head>
 
 <body>
 
 <div class="lesson">
-<h2>Relation & Function Concept</h2>
-<p>• <span class="highlight">Domain</span> = Input values (x)</p>
-<p>• <span class="highlight">Range</span> = Output values (y = f(x))</p>
-<p>• A function maps each input to exactly one output</p>
+    <h2>Relation & Function Lab</h2>
+    <p><span class="highlight">Domain</span> (Input x) → <span class="highlight">Function</span> (Rule) → <span class="highlight">Range</span> (Output y)</p>
 </div>
 
 <select id="mode" onchange="resetUI()">
-<option value="forward">Domain → Range</option>
-<option value="inverse">Range → Domain</option>
-<option value="quiz">Quiz Mode</option>
+    <option value="forward">Explore: Domain → Range</option>
+    <option value="inverse">Explore: Range → Domain</option>
+    <option value="quiz">Mode: Random Quiz Challenge</option>
 </select>
 
 <div id="machine">
-<div id="ball">0</div>
-f(x)=3x+5
+    <div id="ball"></div>
+    <div id="formulaDisplay">f(x) = 3x + 5</div>
 </div>
 
-<div class="controls">
-
-<input id="input" type="number" placeholder="Enter value">
-
-<button onclick="run()">RUN</button>
-<button onclick="newQuiz()">NEW QUIZ</button>
-
-<div id="output"></div>
+<div class="controls" id="mainControls">
+    <input id="input" type="number" placeholder="Enter value">
+    <button onclick="run()">RUN MACHINE</button>
+    <div id="output"></div>
 </div>
 
 <div class="quizBox" id="quizBox">
-<h3 id="qText"></h3>
-<input id="answer" type="number" placeholder="Answer">
-<button onclick="checkAnswer()">Submit</button>
-<p id="result"></p>
+    <h3 id="qText">Generating...</h3>
+    <input id="answer" type="number" placeholder="Your answer">
+    <button onclick="checkAnswer()">Submit Answer</button>
+    <button class="quiz-btn" onclick="newQuiz()" style="margin-top:10px">Next Question</button>
+    <p id="result"></p>
 </div>
 
 <script>
+    let currentAnswer = null;
 
-let currentAnswer = null;
+    function resetUI() {
+        const mode = document.getElementById("mode").value;
+        const mainControls = document.getElementById("mainControls");
+        const quizBox = document.getElementById("quizBox");
+        const output = document.getElementById("output");
+        
+        output.innerText = "";
+        
+        if (mode === "quiz") {
+            mainControls.style.display = "none";
+            newQuiz();
+        } else {
+            mainControls.style.display = "flex";
+            quizBox.style.display = "none";
+            document.getElementById("formulaDisplay").innerText = "f(x) = 3x + 5";
+        }
+    }
 
-function resetUI(){
-document.getElementById("output").innerText="";
-document.getElementById("quizBox").style.display="none";
-}
+    function run() {
+        const mode = document.getElementById("mode").value;
+        const input = parseFloat(document.getElementById("input").value);
+        const ball = document.getElementById("ball");
+        const output = document.getElementById("output");
 
-function run(){
+        if (isNaN(input)) return alert("Please enter a number first");
 
-const mode = document.getElementById("mode").value;
-const input = parseFloat(document.getElementById("input").value);
-const ball = document.getElementById("ball");
-const output = document.getElementById("output");
+        // Reset animation
+        ball.classList.remove("animate");
+        void ball.offsetWidth; 
+        ball.classList.add("animate");
 
-if(isNaN(input)) return alert("Enter value");
+        if (mode === "forward") {
+            ball.innerText = "x=" + input;
+            setTimeout(() => {
+                let y = 3 * input + 5;
+                ball.innerText = "y=" + y;
+                output.innerText = `Input (Domain) ${input} resulted in Output (Range) ${y}`;
+            }, 1200);
+        } 
+        else if (mode === "inverse") {
+            ball.innerText = "y=" + input;
+            setTimeout(() => {
+                let x = (input - 5) / 3;
+                let xFixed = Number.isInteger(x) ? x : x.toFixed(2);
+                ball.innerText = "x=" + xFixed;
+                output.innerText = `To get Range ${input}, the Domain must be ${xFixed}`;
+            }, 1200);
+        }
+    }
 
-ball.classList.remove("animate");
-void ball.offsetWidth;
+    function newQuiz() {
+        document.getElementById("quizBox").style.display = "block";
+        document.getElementById("result").innerText = "";
+        document.getElementById("answer").value = "";
+        
+        const qType = Math.floor(Math.random() * 3); // 0: Linear, 1: Quadratic, 2: Inverse
+        let x = Math.floor(Math.random() * 10) + 1;
+        let a = Math.floor(Math.random() * 5) + 2;
+        let b = Math.floor(Math.random() * 10) + 1;
 
-ball.classList.add("animate");
+        switch(qType) {
+            case 0: // Linear f(x) = ax + b
+                document.getElementById("formulaDisplay").innerText = `f(x) = ${a}x + ${b}`;
+                document.getElementById("qText").innerText = `If f(x) = ${a}x + ${b}, find f(${x})`;
+                currentAnswer = (a * x) + b;
+                break;
+            
+            case 1: // Quadratic f(x) = x^2 + b
+                document.getElementById("formulaDisplay").innerText = `f(x) = x² + ${b}`;
+                document.getElementById("qText").innerText = `If f(x) = x² + ${b}, find f(${x})`;
+                currentAnswer = Math.pow(x, 2) + b;
+                break;
 
-if(mode==="forward"){
-ball.innerText="x="+input;
+            case 2: // Inverse Logic: Find x
+                let targetY = (a * x) + b;
+                document.getElementById("formulaDisplay").innerText = `f(x) = ${a}x + ${b}`;
+                document.getElementById("qText").innerText = `If f(x) = ${targetY}, what is the value of x?`;
+                currentAnswer = x;
+                break;
+        }
+    }
 
-setTimeout(()=>{
-let y = 3*input+5;
-ball.innerText="y="+y;
-output.innerText=`Domain ${input} → Range ${y}`;
-},1200);
+    function checkAnswer() {
+        let ans = parseFloat(document.getElementById("answer").value);
+        let result = document.getElementById("result");
 
-}
-
-else if(mode==="inverse"){
-ball.innerText="y="+input;
-
-setTimeout(()=>{
-let x = (input-5)/3;
-ball.innerText="x="+x.toFixed(2);
-output.innerText=`Range ${input} → Domain ${x.toFixed(2)}`;
-},1200);
-}
-
-}
-
-function newQuiz(){
-
-document.getElementById("quizBox").style.display="block";
-document.getElementById("result").innerText="";
-
-let x = Math.floor(Math.random()*10);
-currentAnswer = 3*x+5;
-
-document.getElementById("qText").innerText =
-`If f(x)=3x+5, find f(${x})`;
-}
-
-function checkAnswer(){
-
-let ans = parseFloat(document.getElementById("answer").value);
-let result = document.getElementById("result");
-
-if(ans === currentAnswer){
-result.innerText="Correct ✔";
-result.style.color="green";
-}else{
-result.innerText="Wrong ❌ Correct: "+currentAnswer;
-result.style.color="red";
-}
-
-}
-
+        if (ans === currentAnswer) {
+            result.innerText = "Correct! 🌟";
+            result.style.color = "green";
+        } else {
+            result.innerText = "Keep trying! Correct answer was: " + currentAnswer;
+            result.style.color = "red";
+        }
+    }
 </script>
 
 </body>
