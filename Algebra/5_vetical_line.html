@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vertical Line Test</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #222; color: white; }
+        canvas { background: #333; border: 2px solid #555; cursor: crosshair; }
+        .controls { margin: 20px; }
+        button { padding: 15px; font-size: 1.2rem; cursor: pointer; border-radius: 8px; border: none; background: #3498db; color: white; margin: 0 10px;}
+        .status { font-size: 1.5rem; font-weight: bold; margin-top: 10px; }
+        .is-function { color: #2ecc71; }
+        .not-function { color: #e74c3c; }
+    </style>
+</head>
+<body>
+
+    <h1>Vertical Line Test</h1>
+    <p>Move the vertical line across the graph. If it touches more than 1 point, it's NOT a function!</p>
+
+    <div class="controls">
+        <button onclick="setGraph('parabola')">Check Parabola</button>
+        <button onclick="setGraph('circle')">Check Circle</button>
+    </div>
+
+    <canvas id="graphCanvas" width="600" height="400"></canvas>
+    
+    <div id="status" class="status"></div>
+
+    <script>
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+        let currentGraph = 'parabola';
+        let mouseX = 300;
+
+        function drawGrid() {
+            ctx.strokeStyle = "#444";
+            ctx.lineWidth = 1;
+            for(let i=0; i<canvas.width; i+=40) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); ctx.stroke(); }
+            for(let i=0; i<canvas.height; i+=40) { ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(canvas.width,i); ctx.stroke(); }
+        }
+
+        function drawGraphs() {
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            if(currentGraph === 'parabola') {
+                ctx.strokeStyle = "#2ecc71";
+                for(let x=0; x<canvas.width; x++) {
+                    let val = (x - 300) / 20;
+                    let y = 300 - (val * val * 5);
+                    x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                }
+            } else {
+                ctx.strokeStyle = "#e74c3c";
+                ctx.arc(300, 200, 100, 0, Math.PI * 2);
+            }
+            ctx.stroke();
+        }
+
+        function update() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawGrid();
+            drawGraphs();
+
+            // Draw Vertical Line
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath(); ctx.moveTo(mouseX, 0); ctx.lineTo(mouseX, canvas.height); ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Intersections
+            const status = document.getElementById('status');
+            if (currentGraph === 'parabola') {
+                status.innerHTML = "PASS: Vertical line touches only 1 point. <span class='is-function'>IT IS A FUNCTION.</span>";
+            } else {
+                if (mouseX > 200 && mouseX < 400) {
+                    status.innerHTML = "FAIL: Vertical line touches 2 points. <span class='not-function'>NOT A FUNCTION.</span>";
+                    ctx.fillStyle = "yellow";
+                    ctx.beginPath(); ctx.arc(mouseX, 200 - Math.sqrt(100**2 - (mouseX-300)**2), 8, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(mouseX, 200 + Math.sqrt(100**2 - (mouseX-300)**2), 8, 0, Math.PI*2); ctx.fill();
+                } else {
+                    status.innerHTML = "Move the line over the shape.";
+                }
+            }
+        }
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            update();
+        });
+
+        function setGraph(g) { currentGraph = g; update(); }
+        update();
+    </script>
+</body>
+</html>

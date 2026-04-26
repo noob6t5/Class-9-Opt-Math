@@ -5,27 +5,22 @@
     <title>Function Types: Lab & Quiz</title>
     <style>
         :root { --primary: #2c3e50; --accent: #e74c3c; --success: #27ae60; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: var(--bg); margin: 0; padding: 20px; }
-        
-        /* Mode Switcher */
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: var(--bg); margin: 0; padding: 20px; }
         .mode-selector { margin-bottom: 20px; background: white; padding: 15px; display: inline-block; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .mode-btn { padding: 10px 25px; font-size: 1.1rem; cursor: pointer; border: 2px solid var(--primary); background: white; color: var(--primary); font-weight: bold; border-radius: 5px; }
         .mode-btn.active { background: var(--primary); color: white; }
-
         .container { display: flex; justify-content: center; gap: 120px; margin-top: 60px; position: relative; height: 350px; }
         .set { width: 160px; height: 300px; border: 4px solid var(--primary); border-radius: 40px; background: white; display: flex; flex-direction: column; justify-content: space-around; align-items: center; position: relative; z-index: 2;}
         .label { position: absolute; top: -40px; font-weight: bold; color: var(--primary); font-size: 1.1rem; width: 180px;}
         .element { width: 50px; height: 50px; border-radius: 50%; background: #3498db; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; }
-        
         svg { position: absolute; width: 100%; height: 100%; pointer-events: none; z-index: 1; top: 0; left: 0; }
-        
-        .controls { margin-top: 30px; min-height: 120px; }
-        button { margin: 5px; padding: 12px 20px; cursor: pointer; font-size: 1rem; border-radius: 8px; border: 1px solid #ccc; background: white; transition: 0.2s; }
-        button:hover { background: #eee; }
+        .controls { margin-top: 30px; min-height: 150px; }
+        button { margin: 5px; padding: 12px 20px; cursor: pointer; font-size: 1rem; border-radius: 8px; border: 1px solid #ccc; background: white; }
         .opt-btn { background: #fff; border: 2px solid var(--primary); font-weight: bold; }
         .action-btn { background: var(--success); color: white; border: none; font-weight: bold; }
-
+        .reason-btn { background: #9b59b6; color: white; border: none; font-weight: bold; display: none; }
         .info-box { margin-top: 15px; font-size: 1.3rem; font-weight: bold; color: var(--primary); min-height: 40px; }
+        #reasonText { margin-top: 10px; color: #555; font-style: italic; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.4;}
         .correct { color: var(--success); }
         .wrong { color: var(--accent); }
     </style>
@@ -72,20 +67,30 @@
         </div>
 
         <div id="quizControls" style="display:none;">
-            <button class="action-btn" onclick="generateQuiz()">New Question</button>
+            <button class="action-btn" onclick="generateQuiz()">Next Question</button>
             <p>What type is this?</p>
             <button class="opt-btn" onclick="check('oneone')">One-to-One</button>
-            <button class="opt-btn" onclick="check('manyone')">Many-to-One</button>
+            <button class="opt-btn" onclick="check('manyone')">Many-One</button>
             <button class="opt-btn" onclick="check('into')">Into</button>
             <button class="opt-btn" onclick="check('onto')">Onto</button>
         </div>
 
-        <div class="info-box" id="info">Click a type to view mapping</div>
+        <div class="info-box" id="info">Select a type below</div>
+        <button id="btnReason" class="reason-btn" onclick="toggleReason()">Show Reason</button>
+        <div id="reasonText"></div>
     </div>
 
 <script>
     let currentMode = 'learn';
     let correctAnswer = '';
+    
+    // Nepali + English Explanations
+    const explanations = {
+        'oneone': "ONE-TO-ONE: Every input has its own separate partner. (प्रत्येक Input को छुट्टाछुट्टै Image छ।)",
+        'manyone': "MANY-ONE: More than one input shares the same image. (दुई वा सोभन्दा बढी Input को एउटै Image छ।)",
+        'into': "INTO: There's an empty element in Set B with no partner. (Set B मा कम्तिमा एउटा यस्तो Element छ जसको कुनै Pre-image छैन।)",
+        'onto': "ONTO: Every element in Set B has a partner. No one is left out. (Set B का सबै Element को Pre-image छ। कोहि पनि खाली छैन।)"
+    };
 
     function setMode(m) {
         currentMode = m;
@@ -93,19 +98,19 @@
         document.getElementById('btnQuiz').classList.toggle('active', m === 'quiz');
         document.getElementById('learnControls').style.display = (m === 'learn') ? 'block' : 'none';
         document.getElementById('quizControls').style.display = (m === 'quiz') ? 'block' : 'none';
-        document.getElementById('mainHeading').innerText = (m === 'learn') ? 'Mapping: Learn the Types' : 'Function Type Quiz';
-        reset();
-        document.getElementById('info').innerHTML = (m === 'learn') ? "Select a type below" : "Click 'New Question' to start";
+        
+        if (m === 'quiz') {
+            generateQuiz(); // Fix: Generate arrows immediately
+        } else {
+            reset();
+            hideReason();
+            show('oneone');
+            document.getElementById('info').innerHTML = "Select a type below";
+        }
     }
 
     function reset(){
-        const svg = document.getElementById("svg");
-        svg.innerHTML = `
-            <defs>
-                <marker id="arrow" markerWidth="10" markerHeight="10" refX="0" refY="5" orient="auto">
-                    <polygon points="0 0, 10 5, 0 10" fill="red"/>
-                </marker>
-            </defs>`;
+        document.getElementById("svg").innerHTML = `<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="0" refY="5" orient="auto"><polygon points="0 0, 10 5, 0 10" fill="red"/></marker></defs>`;
     }
 
     function line(a,b){
@@ -113,12 +118,8 @@
         const A = document.getElementById(a).getBoundingClientRect();
         const B = document.getElementById(b).getBoundingClientRect();
         const C = document.getElementById("box").getBoundingClientRect();
-
-        let x1 = A.right - C.left;
-        let y1 = A.top + A.height/2 - C.top;
-        let x2 = B.left - C.left;
-        let y2 = B.top + B.height/2 - C.top;
-
+        let x1 = A.right - C.left; let y1 = A.top + A.height/2 - C.top;
+        let x2 = B.left - C.left; let y2 = B.top + B.height/2 - C.top;
         let l = document.createElementNS("http://www.w3.org/2000/svg","line");
         l.setAttribute("x1",x1); l.setAttribute("y1",y1);
         l.setAttribute("x2",x2); l.setAttribute("y2",y2);
@@ -129,42 +130,46 @@
 
     function show(type) {
         reset();
-        if(type==="oneone"){
-            line("a1","b1"); line("a2","b2"); line("a3","b3");
-            document.getElementById("info").innerHTML = "ONE-TO-ONE: Every element in A maps to a unique element in B.";
-        }
-        if(type==="manyone"){
-            line("a1","b1"); line("a2","b1"); line("a3","b2");
-            document.getElementById("info").innerHTML = "MANY-TO-ONE: Multiple elements in A share the same image in B.";
-        }
-        if(type==="into"){
-            line("a1","b1"); line("a2","b2"); line("a3","b2");
-            document.getElementById("info").innerHTML = "INTO: At least one element in Codomain (z) has no pre-image.";
-        }
-        if(type==="onto"){
-            line("a1","b1"); line("a2","b3"); line("a3","b2");
-            document.getElementById("info").innerHTML = "ONTO: Every element in B is used as an image. Range = Codomain.";
-        }
+        if(type==="oneone"){ line("a1","b1"); line("a2","b2"); line("a3","b3"); }
+        if(type==="manyone"){ line("a1","b1"); line("a2","b1"); line("a3","b2"); }
+        if(type==="into"){ line("a1","b1"); line("a2","b2"); line("a3","b2"); }
+        if(type==="onto"){ line("a1","b1"); line("a2","b3"); line("a3","b2"); }
+        if(currentMode === 'learn') document.getElementById('info').innerText = explanations[type];
     }
 
     function generateQuiz() {
-        reset();
+        hideReason();
         const types = ['oneone', 'manyone', 'into', 'onto'];
-        const randomType = types[Math.floor(Math.random() * types.length)];
-        correctAnswer = randomType;
-        show(randomType);
-        document.getElementById('info').innerHTML = "Look at the arrows! What type is this?";
-        document.getElementById('info').className = "info-box";
+        correctAnswer = types[Math.floor(Math.random() * types.length)];
+        show(correctAnswer);
+        document.getElementById('info').innerHTML = "What type of mapping is shown above?";
     }
 
     function check(ans) {
-        if(currentMode !== 'quiz') return;
         const info = document.getElementById('info');
         if(ans === correctAnswer) {
-            info.innerHTML = "<span class='correct'>✔ Correct! Well done.</span>";
+            info.innerHTML = "<span class='correct'>✔ Correct! सही उत्तर!</span>";
+            hideReason();
         } else {
-            info.innerHTML = "<span class='wrong'>✘ Not quite. Study the arrows and try again.</span>";
+            info.innerHTML = "<span class='wrong'>✘ Wrong Answer. गलत भयो।</span>";
+            document.getElementById('btnReason').style.display = 'inline-block';
         }
+    }
+
+    function toggleReason() {
+        const rText = document.getElementById('reasonText');
+        if(rText.innerHTML === "") {
+            rText.innerHTML = "<b>Reason:</b> " + explanations[correctAnswer];
+            document.getElementById('btnReason').innerText = "Hide Reason";
+        } else {
+            hideReason();
+        }
+    }
+
+    function hideReason() {
+        document.getElementById('reasonText').innerHTML = "";
+        document.getElementById('btnReason').style.display = 'none';
+        document.getElementById('btnReason').innerText = "Show Reason";
     }
 
     window.onload = () => show('oneone');
