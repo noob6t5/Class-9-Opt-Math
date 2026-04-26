@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Function Types: Lab & Quiz</title>
+    <style>
+        :root { --primary: #2c3e50; --accent: #e74c3c; --success: #27ae60; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: var(--bg); margin: 0; padding: 20px; }
+        
+        /* Mode Switcher */
+        .mode-selector { margin-bottom: 20px; background: white; padding: 15px; display: inline-block; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .mode-btn { padding: 10px 25px; font-size: 1.1rem; cursor: pointer; border: 2px solid var(--primary); background: white; color: var(--primary); font-weight: bold; border-radius: 5px; }
+        .mode-btn.active { background: var(--primary); color: white; }
+
+        .container { display: flex; justify-content: center; gap: 120px; margin-top: 60px; position: relative; height: 350px; }
+        .set { width: 160px; height: 300px; border: 4px solid var(--primary); border-radius: 40px; background: white; display: flex; flex-direction: column; justify-content: space-around; align-items: center; position: relative; z-index: 2;}
+        .label { position: absolute; top: -40px; font-weight: bold; color: var(--primary); font-size: 1.1rem; width: 180px;}
+        .element { width: 50px; height: 50px; border-radius: 50%; background: #3498db; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; }
+        
+        svg { position: absolute; width: 100%; height: 100%; pointer-events: none; z-index: 1; top: 0; left: 0; }
+        
+        .controls { margin-top: 30px; min-height: 120px; }
+        button { margin: 5px; padding: 12px 20px; cursor: pointer; font-size: 1rem; border-radius: 8px; border: 1px solid #ccc; background: white; transition: 0.2s; }
+        button:hover { background: #eee; }
+        .opt-btn { background: #fff; border: 2px solid var(--primary); font-weight: bold; }
+        .action-btn { background: var(--success); color: white; border: none; font-weight: bold; }
+
+        .info-box { margin-top: 15px; font-size: 1.3rem; font-weight: bold; color: var(--primary); min-height: 40px; }
+        .correct { color: var(--success); }
+        .wrong { color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="mode-selector">
+        <button id="btnLearn" class="mode-btn active" onclick="setMode('learn')">LEARNING MODE</button>
+        <button id="btnQuiz" class="mode-btn" onclick="setMode('quiz')">QUIZ MODE</button>
+    </div>
+
+    <h2 id="mainHeading">Mapping: Learn the Types</h2>
+
+    <div class="container" id="box">
+        <svg id="svg">
+            <defs>
+                <marker id="arrow" markerWidth="10" markerHeight="10" refX="0" refY="5" orient="auto">
+                    <polygon points="0 0, 10 5, 0 10" fill="red"/>
+                </marker>
+            </defs>
+        </svg>
+
+        <div class="set">
+            <div class="label">Domain (Set A)</div>
+            <div class="element" id="a1">1</div>
+            <div class="element" id="a2">2</div>
+            <div class="element" id="a3">3</div>
+        </div>
+
+        <div class="set">
+            <div class="label">Codomain (Set B)</div>
+            <div class="element" id="b1">x</div>
+            <div class="element" id="b2">y</div>
+            <div class="element" id="b3">z</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div id="learnControls">
+            <button onclick="show('oneone')">One-to-One</button>
+            <button onclick="show('manyone')">Many-to-One</button>
+            <button onclick="show('into')">Into Function</button>
+            <button onclick="show('onto')">Onto Function</button>
+        </div>
+
+        <div id="quizControls" style="display:none;">
+            <button class="action-btn" onclick="generateQuiz()">New Question</button>
+            <p>What type is this?</p>
+            <button class="opt-btn" onclick="check('oneone')">One-to-One</button>
+            <button class="opt-btn" onclick="check('manyone')">Many-to-One</button>
+            <button class="opt-btn" onclick="check('into')">Into</button>
+            <button class="opt-btn" onclick="check('onto')">Onto</button>
+        </div>
+
+        <div class="info-box" id="info">Click a type to view mapping</div>
+    </div>
+
+<script>
+    let currentMode = 'learn';
+    let correctAnswer = '';
+
+    function setMode(m) {
+        currentMode = m;
+        document.getElementById('btnLearn').classList.toggle('active', m === 'learn');
+        document.getElementById('btnQuiz').classList.toggle('active', m === 'quiz');
+        document.getElementById('learnControls').style.display = (m === 'learn') ? 'block' : 'none';
+        document.getElementById('quizControls').style.display = (m === 'quiz') ? 'block' : 'none';
+        document.getElementById('mainHeading').innerText = (m === 'learn') ? 'Mapping: Learn the Types' : 'Function Type Quiz';
+        reset();
+        document.getElementById('info').innerHTML = (m === 'learn') ? "Select a type below" : "Click 'New Question' to start";
+    }
+
+    function reset(){
+        const svg = document.getElementById("svg");
+        svg.innerHTML = `
+            <defs>
+                <marker id="arrow" markerWidth="10" markerHeight="10" refX="0" refY="5" orient="auto">
+                    <polygon points="0 0, 10 5, 0 10" fill="red"/>
+                </marker>
+            </defs>`;
+    }
+
+    function line(a,b){
+        const svg = document.getElementById("svg");
+        const A = document.getElementById(a).getBoundingClientRect();
+        const B = document.getElementById(b).getBoundingClientRect();
+        const C = document.getElementById("box").getBoundingClientRect();
+
+        let x1 = A.right - C.left;
+        let y1 = A.top + A.height/2 - C.top;
+        let x2 = B.left - C.left;
+        let y2 = B.top + B.height/2 - C.top;
+
+        let l = document.createElementNS("http://www.w3.org/2000/svg","line");
+        l.setAttribute("x1",x1); l.setAttribute("y1",y1);
+        l.setAttribute("x2",x2); l.setAttribute("y2",y2);
+        l.setAttribute("stroke","red"); l.setAttribute("stroke-width","3");
+        l.setAttribute("marker-end","url(#arrow)");
+        svg.appendChild(l);
+    }
+
+    function show(type) {
+        reset();
+        if(type==="oneone"){
+            line("a1","b1"); line("a2","b2"); line("a3","b3");
+            document.getElementById("info").innerHTML = "ONE-TO-ONE: Every element in A maps to a unique element in B.";
+        }
+        if(type==="manyone"){
+            line("a1","b1"); line("a2","b1"); line("a3","b2");
+            document.getElementById("info").innerHTML = "MANY-TO-ONE: Multiple elements in A share the same image in B.";
+        }
+        if(type==="into"){
+            line("a1","b1"); line("a2","b2"); line("a3","b2");
+            document.getElementById("info").innerHTML = "INTO: At least one element in Codomain (z) has no pre-image.";
+        }
+        if(type==="onto"){
+            line("a1","b1"); line("a2","b3"); line("a3","b2");
+            document.getElementById("info").innerHTML = "ONTO: Every element in B is used as an image. Range = Codomain.";
+        }
+    }
+
+    function generateQuiz() {
+        reset();
+        const types = ['oneone', 'manyone', 'into', 'onto'];
+        const randomType = types[Math.floor(Math.random() * types.length)];
+        correctAnswer = randomType;
+        show(randomType);
+        document.getElementById('info').innerHTML = "Look at the arrows! What type is this?";
+        document.getElementById('info').className = "info-box";
+    }
+
+    function check(ans) {
+        if(currentMode !== 'quiz') return;
+        const info = document.getElementById('info');
+        if(ans === correctAnswer) {
+            info.innerHTML = "<span class='correct'>✔ Correct! Well done.</span>";
+        } else {
+            info.innerHTML = "<span class='wrong'>✘ Not quite. Study the arrows and try again.</span>";
+        }
+    }
+
+    window.onload = () => show('oneone');
+</script>
+</body>
+</html>

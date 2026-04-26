@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Domain & Range Learning Machine</title>
+<style>
+:root{
+    --primary:#2c3e50;
+    --accent:#f1c40f;
+    --success:#27ae60;
+    --danger:#e74c3c;
+}
+
+body{
+    font-family:Segoe UI;
+    background:#ecf0f1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    margin:0;
+    padding:20px;
+}
+
+.lesson{
+    text-align:center;
+    max-width:800px;
+    margin-bottom:20px;
+}
+
+.lesson h2{color:var(--primary);}
+.highlight{color:var(--danger); font-weight:bold;}
+
+#machine{
+    width:360px;
+    height:240px;
+    background:var(--primary);
+    border-radius:15px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:white;
+    font-size:2rem;
+    position:relative;
+    margin-top:20px;
+}
+
+#ball{
+    width:80px;
+    height:80px;
+    background:var(--accent);
+    border-radius:50%;
+    position:absolute;
+    top:-120px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+    opacity:0;
+}
+
+.animate{animation:move 2.5s ease-in-out forwards;}
+
+@keyframes move{
+    0%{top:-120px;opacity:0;}
+    20%{top:-40px;opacity:1;}
+    50%{top:90px;}
+    80%{top:240px;}
+    100%{top:240px;opacity:1;}
+}
+
+.controls{
+    margin-top:30px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+}
+
+input,button,select{
+    padding:10px;
+    font-size:1.1rem;
+}
+
+button{
+    background:var(--success);
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+
+#output{
+    margin-top:10px;
+    font-weight:bold;
+    color:var(--danger);
+    min-height:25px;
+}
+
+.quizBox{
+    margin-top:20px;
+    padding:15px;
+    background:white;
+    border-radius:10px;
+    display:none;
+    text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="lesson">
+<h2>Relation & Function Concept</h2>
+<p>• <span class="highlight">Domain</span> = Input values (x)</p>
+<p>• <span class="highlight">Range</span> = Output values (y = f(x))</p>
+<p>• A function maps each input to exactly one output</p>
+</div>
+
+<select id="mode" onchange="resetUI()">
+<option value="forward">Domain → Range</option>
+<option value="inverse">Range → Domain</option>
+<option value="quiz">Quiz Mode</option>
+</select>
+
+<div id="machine">
+<div id="ball">0</div>
+f(x)=3x+5
+</div>
+
+<div class="controls">
+
+<input id="input" type="number" placeholder="Enter value">
+
+<button onclick="run()">RUN</button>
+<button onclick="newQuiz()">NEW QUIZ</button>
+
+<div id="output"></div>
+</div>
+
+<div class="quizBox" id="quizBox">
+<h3 id="qText"></h3>
+<input id="answer" type="number" placeholder="Answer">
+<button onclick="checkAnswer()">Submit</button>
+<p id="result"></p>
+</div>
+
+<script>
+
+let currentAnswer = null;
+
+function resetUI(){
+document.getElementById("output").innerText="";
+document.getElementById("quizBox").style.display="none";
+}
+
+function run(){
+
+const mode = document.getElementById("mode").value;
+const input = parseFloat(document.getElementById("input").value);
+const ball = document.getElementById("ball");
+const output = document.getElementById("output");
+
+if(isNaN(input)) return alert("Enter value");
+
+ball.classList.remove("animate");
+void ball.offsetWidth;
+
+ball.classList.add("animate");
+
+if(mode==="forward"){
+ball.innerText="x="+input;
+
+setTimeout(()=>{
+let y = 3*input+5;
+ball.innerText="y="+y;
+output.innerText=`Domain ${input} → Range ${y}`;
+},1200);
+
+}
+
+else if(mode==="inverse"){
+ball.innerText="y="+input;
+
+setTimeout(()=>{
+let x = (input-5)/3;
+ball.innerText="x="+x.toFixed(2);
+output.innerText=`Range ${input} → Domain ${x.toFixed(2)}`;
+},1200);
+}
+
+}
+
+function newQuiz(){
+
+document.getElementById("quizBox").style.display="block";
+document.getElementById("result").innerText="";
+
+let x = Math.floor(Math.random()*10);
+currentAnswer = 3*x+5;
+
+document.getElementById("qText").innerText =
+`If f(x)=3x+5, find f(${x})`;
+}
+
+function checkAnswer(){
+
+let ans = parseFloat(document.getElementById("answer").value);
+let result = document.getElementById("result");
+
+if(ans === currentAnswer){
+result.innerText="Correct ✔";
+result.style.color="green";
+}else{
+result.innerText="Wrong ❌ Correct: "+currentAnswer;
+result.style.color="red";
+}
+
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inverse of Ordered Pairs - Interactive</title>
+    <style>
+        :root { --primary: #34495e; --accent: #e67e22; --danger: #e74c3c; --success: #2ecc71; }
+        body { font-family: 'Segoe UI', sans-serif; background: #fdfefe; text-align: center; padding: 20px; margin: 0; }
+        .container { max-width: 900px; margin: auto; }
+        
+        .input-area { background: #ecf0f1; padding: 25px; border-radius: 15px; margin-bottom: 20px; display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap;}
+        input { font-size: 1.5rem; padding: 10px; width: 80px; text-align: center; border-radius: 8px; border: 2px solid #bdc3c7; }
+        
+        .btn { font-size: 1.2rem; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-add { background: var(--success); color: white; }
+        .btn-clear { background: var(--danger); color: white; }
+        .btn-inverse { background: var(--accent); color: white; font-size: 1.5rem; width: 100%; margin: 20px 0; }
+        .btn:active { transform: scale(0.95); }
+
+        .relation-box { border: 3px dashed #bdc3c7; padding: 25px; min-height: 120px; margin: 20px 0; border-radius: 15px; font-size: 1.5rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; background: #fafafa;}
+        
+        .pair-container { position: relative; display: flex; align-items: center; }
+        .pair { background: var(--primary); color: white; padding: 12px 20px; border-radius: 10px; font-weight: bold; position: relative; }
+        .del-btn { background: var(--danger); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; position: absolute; top: -12px; right: -12px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        
+        .inverse-pair { background: var(--accent); border: 2px solid #d35400; }
+        .label-text { font-size: 1.6rem; font-weight: bold; color: var(--primary); margin-bottom: 10px; }
+        sup { font-size: 0.8em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Inverse Relation Calculator</h2>
+        <p>Input ordered pairs for Relation <b>R</b></p>
+
+        <div class="input-area">
+            <span style="font-size: 2rem;">(</span>
+            <input type="text" id="valX" placeholder="x">
+            <span style="font-size: 2rem;">,</span>
+            <input type="text" id="valY" placeholder="y">
+            <span style="font-size: 2rem;">)</span>
+            <button class="btn btn-add" onclick="addPair()">Add Pair</button>
+            <button class="btn btn-clear" onclick="clearAll()">Clear All</button>
+        </div>
+
+        <div class="label-text">Relation R = { ... }</div>
+        <div class="relation-box" id="relationR"></div>
+
+        <button class="btn btn-inverse" onclick="findInverse()">Generate Inverse R<sup>-1</sup></button>
+
+        <div class="label-text">Inverse Relation R<sup>-1</sup> = { ... }</div>
+        <div class="relation-box" id="relationInverse"></div>
+    </div>
+
+    <script>
+        let pairs = [];
+
+        function addPair() {
+            const x = document.getElementById('valX').value;
+            const y = document.getElementById('valY').value;
+            if(!x || !y) return;
+            
+            pairs.push({x, y});
+            renderR();
+            
+            document.getElementById('valX').value = '';
+            document.getElementById('valY').value = '';
+            document.getElementById('valX').focus();
+        }
+
+        function removePair(index) {
+            pairs.splice(index, 1);
+            renderR();
+        }
+
+        function clearAll() {
+            pairs = [];
+            renderR();
+        }
+
+        function renderR() {
+            const box = document.getElementById('relationR');
+            box.innerHTML = '';
+            pairs.forEach((p, index) => {
+                box.innerHTML += `
+                    <div class="pair-container">
+                        <div class="pair">(${p.x}, ${p.y})</div>
+                        <button class="del-btn" onclick="removePair(${index})">×</button>
+                    </div>`;
+            });
+            document.getElementById('relationInverse').innerHTML = ''; 
+        }
+
+        function findInverse() {
+            const invBox = document.getElementById('relationInverse');
+            invBox.innerHTML = '';
+            
+            if(pairs.length === 0) {
+                invBox.innerHTML = "<span style='color:#7f8c8d; font-size: 1.2rem;'>Add pairs to R first</span>";
+                return;
+            }
+
+            pairs.forEach((p, index) => {
+                setTimeout(() => {
+                    invBox.innerHTML += `<div class="pair inverse-pair">(${p.y}, ${p.x})</div>`;
+                }, index * 250); 
+            });
+        }
+    </script>
+</body>
+</html>

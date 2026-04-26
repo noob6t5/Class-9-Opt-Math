@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartesian Product Visualizer</title>
+    <style>
+        body { font-family: sans-serif; background: #fff; text-align: center; padding: 20px; }
+        .set-inputs { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; }
+        .set-box { background: #fdf2e9; padding: 20px; border-radius: 10px; border: 2px solid #e67e22; }
+        input { font-size: 1.2rem; padding: 10px; width: 200px; text-align: center; }
+        .action-buttons { margin: 20px 0; display: flex; justify-content: center; gap: 15px; }
+        button { font-size: 1.5rem; padding: 15px 25px; background: #8e44ad; color: white; border: none; border-radius: 8px; cursor: pointer; }
+        #output-area { margin-top: 30px; font-size: 1.4rem; padding: 20px; background: #f4f6f7; border-radius: 10px; min-height: 100px; line-height: 1.8; }
+        .pair { display: inline-block; background: #fff; border: 1px solid #ccc; padding: 5px 10px; margin: 5px; border-radius: 5px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <h2>Cartesian Product of Sets</h2>
+    <p>Enter elements separated by commas (e.g., 1, 2, 3)</p>
+
+    <div class="set-inputs">
+        <div class="set-box">
+            <h3>Set A</h3>
+            <input type="text" id="setA" value="1, 2">
+        </div>
+        <div class="set-box">
+            <h3>Set B</h3>
+            <input type="text" id="setB" value="a, b">
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <button onclick="calculateProduct('A', 'B')">A × B</button>
+        <button onclick="calculateProduct('B', 'A')">B × A</button>
+        <button onclick="calculateProduct('A', 'A')">A × A</button>
+    </div>
+
+    <div id="output-area">Select an operation above to view the Cartesian Product.</div>
+
+    <script>
+        function getSet(id) {
+            const val = document.getElementById(id).value;
+            return val.split(',').map(item => item.trim()).filter(item => item !== "");
+        }
+
+        function calculateProduct(first, second) {
+            const set1 = getSet(`set${first}`);
+            const set2 = getSet(`set${second}`);
+            const output = document.getElementById('output-area');
+
+            if(set1.length === 0 || set2.length === 0) {
+                output.innerHTML = "<span style='color:red;'>Make sure both sets have elements!</span>";
+                return;
+            }
+
+            let resultHTML = `<b>${first} × ${second} = {</b> <br>`;
+            
+            let pairs = [];
+            for(let i=0; i < set1.length; i++) {
+                for(let j=0; j < set2.length; j++) {
+                    pairs.push(`<span class="pair">(${set1[i]}, ${set2[j]})</span>`);
+                }
+            }
+
+            resultHTML += pairs.join(', ');
+            resultHTML += `<br><b>}</b>`;
+            
+            output.innerHTML = resultHTML;
+        }
+    </script>
+</body>
+</html>
