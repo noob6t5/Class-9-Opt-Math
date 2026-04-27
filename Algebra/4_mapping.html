@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Function Types: Lab & Quiz</title>
     <style>
         :root { --primary: #2c3e50; --accent: #e74c3c; --success: #27ae60; --bg: #f4f7f6; }
@@ -37,7 +38,7 @@
     <div class="container" id="box">
         <svg id="svg">
             <defs>
-                <marker id="arrow" markerWidth="10" markerHeight="10" refX="0" refY="5" orient="auto">
+                <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
                     <polygon points="0 0, 10 5, 0 10" fill="red"/>
                 </marker>
             </defs>
@@ -83,8 +84,8 @@
 <script>
     let currentMode = 'learn';
     let correctAnswer = '';
+    let currentType = 'oneone'; // State to keep track of what is currently drawn
     
-    // Nepali + English Explanations
     const explanations = {
         'oneone': "ONE-TO-ONE: Every input has its own separate partner. (प्रत्येक Input को छुट्टाछुट्टै Image छ।)",
         'manyone': "MANY-ONE: More than one input shares the same image. (दुई वा सोभन्दा बढी Input को एउटै Image छ।)",
@@ -100,7 +101,7 @@
         document.getElementById('quizControls').style.display = (m === 'quiz') ? 'block' : 'none';
         
         if (m === 'quiz') {
-            generateQuiz(); // Fix: Generate arrows immediately
+            generateQuiz();
         } else {
             reset();
             hideReason();
@@ -110,32 +111,59 @@
     }
 
     function reset(){
-        document.getElementById("svg").innerHTML = `<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="0" refY="5" orient="auto"><polygon points="0 0, 10 5, 0 10" fill="red"/></marker></defs>`;
+        const svg = document.getElementById("svg");
+        // Clear previous lines but keep the arrow definition
+        svg.innerHTML = `
+            <defs>
+                <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+                    <polygon points="0 0, 10 5, 0 10" fill="red"/>
+                </marker>
+            </defs>`;
     }
 
     function line(a,b){
         const svg = document.getElementById("svg");
-        const A = document.getElementById(a).getBoundingClientRect();
-        const B = document.getElementById(b).getBoundingClientRect();
-        const C = document.getElementById("box").getBoundingClientRect();
-        let x1 = A.right - C.left; let y1 = A.top + A.height/2 - C.top;
-        let x2 = B.left - C.left; let y2 = B.top + B.height/2 - C.top;
+        const box = document.getElementById("box");
+        
+        const elA = document.getElementById(a);
+        const elB = document.getElementById(b);
+        
+        const rectA = elA.getBoundingClientRect();
+        const rectB = elB.getBoundingClientRect();
+        const rectSVG = svg.getBoundingClientRect();
+
+        // Calculate coordinates relative to the SVG element
+        let x1 = rectA.right - rectSVG.left; 
+        let y1 = (rectA.top + rectA.height/2) - rectSVG.top;
+        let x2 = rectB.left - rectSVG.left; 
+        let y2 = (rectB.top + rectB.height/2) - rectSVG.top;
+
         let l = document.createElementNS("http://www.w3.org/2000/svg","line");
-        l.setAttribute("x1",x1); l.setAttribute("y1",y1);
-        l.setAttribute("x2",x2); l.setAttribute("y2",y2);
-        l.setAttribute("stroke","red"); l.setAttribute("stroke-width","3");
+        l.setAttribute("x1",x1); 
+        l.setAttribute("y1",y1);
+        l.setAttribute("x2",x2); 
+        l.setAttribute("y2",y2);
+        l.setAttribute("stroke","red"); 
+        l.setAttribute("stroke-width","3");
         l.setAttribute("marker-end","url(#arrow)");
         svg.appendChild(l);
     }
 
     function show(type) {
+        currentType = type; // Store the type for redrawing
         reset();
         if(type==="oneone"){ line("a1","b1"); line("a2","b2"); line("a3","b3"); }
         if(type==="manyone"){ line("a1","b1"); line("a2","b1"); line("a3","b2"); }
         if(type==="into"){ line("a1","b1"); line("a2","b2"); line("a3","b2"); }
         if(type==="onto"){ line("a1","b1"); line("a2","b3"); line("a3","b2"); }
+        
         if(currentMode === 'learn') document.getElementById('info').innerText = explanations[type];
     }
+
+    // FIX: Listen for window resize or zoom events and redraw
+    window.addEventListener('resize', () => {
+        show(currentType);
+    });
 
     function generateQuiz() {
         hideReason();
