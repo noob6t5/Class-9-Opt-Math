@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Function Vocabulary Lab</title>
+    <style>
+        :root { --primary: #2c3e50; --accent: #8e44ad; --success: #27ae60; --bg: #f9f9f9; }
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: var(--bg); padding: 20px; }
+        
+        .container { display: flex; justify-content: center; gap: 100px; margin-top: 40px; position: relative; height: 320px; }
+        .set { width: 140px; height: 280px; border: 3px solid var(--primary); border-radius: 30px; background: white; display: flex; flex-direction: column; justify-content: space-around; align-items: center; position: relative; z-index: 2;}
+        .element { width: 40px; height: 40px; border-radius: 50%; background: #3498db; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        
+        svg { position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: 1; pointer-events: none; }
+        
+        .workspace { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 800px; margin: 30px auto; text-align: left; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .vocab-item { padding: 10px; border-bottom: 1px solid #eee; }
+        .vocab-item b { color: var(--primary); display: block; margin-bottom: 5px; }
+        
+        .ans-area { color: var(--accent); font-weight: bold; min-height: 20px; cursor: pointer; background: #f0f0f0; padding: 5px; border-radius: 5px; text-align: center;}
+        button { background: var(--success); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-size: 1rem; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h2>Vocabulary Lab: Domain, Range & Images</h2>
+    <p>Click the gray boxes to reveal the answers!</p>
+
+    <div class="container" id="box">
+        <svg id="svg">
+            <defs>
+                <marker id="arrow" markerWidth="10" markerHeight="10" refX="0" refY="5" orient="auto">
+                    <polygon points="0 0, 10 5, 0 10" fill="#e74c3c"/>
+                </marker>
+            </defs>
+        </svg>
+
+        <div class="set">
+            <div style="position:absolute; top:-30px; font-weight:bold;">Set A</div>
+            <div class="element" id="a1">1</div>
+            <div class="element" id="a2">2</div>
+            <div class="element" id="a3">3</div>
+        </div>
+
+        <div class="set">
+            <div style="position:absolute; top:-30px; font-weight:bold;">Set B</div>
+            <div class="element" id="b1">x</div>
+            <div class="element" id="b2">y</div>
+            <div class="element" id="b3">z</div>
+            <div class="element" id="b4">w</div>
+        </div>
+    </div>
+
+    <button onclick="generateNew()">New Random Mapping</button>
+
+    <div class="workspace">
+        <div class="vocab-item">
+            <b>Domain (क्षेत्र)</b>
+            <div id="ansDomain" class="ans-area" onclick="reveal(this)">Show Domain</div>
+        </div>
+        <div class="vocab-item">
+            <b>Codomain (सह-क्षेत्र)</b>
+            <div id="ansCodomain" class="ans-area" onclick="reveal(this)">Show Codomain</div>
+        </div>
+        <div class="vocab-item">
+            <b>Range (विस्तार क्षेत्र)</b>
+            <div id="ansRange" class="ans-area" onclick="reveal(this)">Show Range</div>
+        </div>
+        <div class="vocab-item">
+            <b>Image of 2 (प्रतिविम्ब)</b>
+            <div id="ansImage" class="ans-area" onclick="reveal(this)">Show Image</div>
+        </div>
+    </div>
+
+<script>
+    let currentMapping = {};
+
+    function line(a,b){
+        const svg = document.getElementById("svg");
+        const A = document.getElementById(a).getBoundingClientRect();
+        const B = document.getElementById(b).getBoundingClientRect();
+        const C = document.getElementById("box").getBoundingClientRect();
+        let x1 = A.right - C.left; let y1 = A.top + A.height/2 - C.top;
+        let x2 = B.left - C.left; let y2 = B.top + B.height/2 - C.top;
+        let l = document.createElementNS("http://www.w3.org/2000/svg","line");
+        l.setAttribute("x1",x1); l.setAttribute("y1",y1);
+        l.setAttribute("x2",x2); l.setAttribute("y2",y2);
+        l.setAttribute("stroke","#e74c3c"); l.setAttribute("stroke-width","3");
+        l.setAttribute("marker-end","url(#arrow)");
+        svg.appendChild(l);
+    }
+
+    function generateNew() {
+        const svg = document.getElementById("svg");
+        svg.innerHTML = `<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="0" refY="5" orient="auto"><polygon points="0 0, 10 5, 0 10" fill="#e74c3c"/></marker></defs>`;
+        
+        // Reset all answer boxes
+        document.querySelectorAll('.ans-area').forEach(el => {
+            el.style.background = "#f0f0f0";
+            el.innerText = "Click to reveal";
+        });
+
+        // Randomize connections
+        const bElements = ['x', 'y', 'z', 'w'];
+        currentMapping = {
+            '1': bElements[Math.floor(Math.random()*4)],
+            '2': bElements[Math.floor(Math.random()*4)],
+            '3': bElements[Math.floor(Math.random()*4)]
+        };
+
+        line('a1', 'b' + (bElements.indexOf(currentMapping['1'])+1));
+        line('a2', 'b' + (bElements.indexOf(currentMapping['2'])+1));
+        line('a3', 'b' + (bElements.indexOf(currentMapping['3'])+1));
+    }
+
+    function reveal(el) {
+        el.style.background = "transparent";
+        const usedValues = [...new Set(Object.values(currentMapping))].sort();
+
+        if(el.id === "ansDomain") el.innerText = "{ 1, 2, 3 }";
+        if(el.id === "ansCodomain") el.innerText = "{ x, y, z, w }";
+        if(el.id === "ansRange") el.innerText = "{ " + usedValues.join(", ") + " }";
+        if(el.id === "ansImage") el.innerText = "Image of 2 is " + currentMapping['2'];
+    }
+
+    window.onload = generateNew;
+</script>
+</body>
+</html>
