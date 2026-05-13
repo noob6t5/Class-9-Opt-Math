@@ -1,290 +1,269 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matrix Mastery Dashboard</title>
-    <style>
-        :root {
-            --primary: #8b5cf6;
-            --bg: #0f172a;
-            --card: #1e293b;
-            --text: #f8fafc;
-            --highlight: #22d3ee;
-            --accent: #fbbf24;
-            --border: #334155;
-        }
+<meta charset="UTF-8">
+<title>Matrix Learning OS v3</title>
 
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
+<style>
+body {
+    font-family: Arial;
+    background:#0f172a;
+    color:#e2e8f0;
+    text-align:center;
+    margin:0;
+    padding:20px;
+}
 
-        .main-container { width: 100%; max-width: 1000px; }
+.card {
+    background:#1e293b;
+    padding:20px;
+    margin:15px auto;
+    border-radius:12px;
+    max-width:800px;
+}
 
-        .header {
-            text-align: center;
-            padding: 40px;
-            background: var(--card);
-            border-radius: 15px;
-            border-bottom: 5px solid var(--primary);
-            margin-bottom: 30px;
-        }
+.grid {
+    display:grid;
+    justify-content:center;
+    gap:5px;
+    margin:15px auto;
+}
 
-        /* Tabs Navigation */
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-        }
+.cell {
+    width:45px;
+    height:45px;
+    background:#334155;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+    border-radius:6px;
+}
 
-        .tab-btn {
-            padding: 12px 24px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            color: #94a3b8;
-            cursor: pointer;
-            border-radius: 8px;
-            font-weight: bold;
-            white-space: nowrap;
-            transition: 0.3s;
-        }
+button {
+    padding:10px 14px;
+    margin:5px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
 
-        .tab-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
+.btn { background:#6366f1; color:white; }
+.btn2 { background:#0ea5e9; color:white; }
+.good { color:#10b981; }
+.bad { color:#ef4444; }
 
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.4s ease;
-        }
+.menu {
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:8px;
+    margin-bottom:15px;
+}
 
-        .tab-content.active { display: block; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Matrix Card Styling */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .card {
-            background: var(--card);
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            position: relative;
-        }
-
-        .matrix-view {
-            background: #0f172a;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            font-family: 'Courier New', monospace;
-            font-size: 1.2rem;
-            color: var(--accent);
-            margin: 15px 0;
-            border-left: 3px solid var(--primary);
-            border-right: 3px solid var(--primary);
-        }
-
-        /* Element Buttons */
-        .el-btn {
-            padding: 15px;
-            background: #1e293b;
-            border: 1px solid var(--border);
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: 0.2s;
-            font-weight: bold;
-        }
-        .el-btn:hover { background: var(--primary); }
-        .el-btn:active { transform: scale(0.95); }
-
-        .address-box {
-            background: #0f172a;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            border-left: 4px solid var(--highlight);
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .mnemonic {
-            background: rgba(34, 211, 238, 0.1);
-            color: var(--highlight);
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            margin-top: 10px;
-            border-left: 3px solid var(--highlight);
-        }
-
-        .badge {
-            font-size: 0.75rem;
-            background: #475569;
-            padding: 3px 8px;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            display: inline-block;
-        }
-
-        sub { font-size: 0.7em; }
-        input { width: 60px; padding: 8px; border-radius: 5px; border: 1px solid var(--primary); background: #0f172a; color: white; text-align: center; }
-    </style>
+.menu button {
+    background:#334155;
+    color:white;
+}
+.menu button:hover {
+    background:#475569;
+}
+</style>
 </head>
+
 <body>
 
-<div class="main-container">
-    <div class="header">
-        <h1>Matrix Mastery Dashboard</h1>
-        <p>Interactive Lesson for Class 9 Optional Mathematics</p>
-    </div>
+<h1>📘 MATRIX LEARNING OS v3</h1>
 
-    <div class="tabs">
-        <button class="tab-btn active" onclick="openTab('intro')">1. Notation & Address</button>
-        <button class="tab-btn" onclick="openTab('order')">2. Finding Order</button>
-        <button class="tab-btn" onclick="openTab('basic-types')">3. Basic Types</button>
-        <button class="tab-btn" onclick="openTab('advanced-types')">4. Advanced Types</button>
-    </div>
+<!-- TOPIC MENU -->
+<div class="card">
+<h2>📚 Choose What to Learn</h2>
+<div class="menu" id="menu"></div>
+</div>
 
-    <div id="intro" class="tab-content active">
-        <div class="card" style="text-align:center;">
-            <h2>The a<sub>ij</sub> Address</h2>
-            <p>Click an element to see its Row and Column position.</p>
-            
-            <div style="display:inline-grid; grid-template-columns: repeat(2, 80px); gap: 15px; background:#0f172a; padding:25px; border-radius:10px; border-left:4px solid var(--primary); border-right:4px solid var(--primary);">
-                <button class="el-btn" onclick="showAddress(1,1)">a<sub>11</sub></button>
-                <button class="el-btn" onclick="showAddress(1,2)">a<sub>12</sub></button>
-                <button class="el-btn" onclick="showAddress(2,1)">a<sub>21</sub></button>
-                <button class="el-btn" onclick="showAddress(2,2)">a<sub>22</sub></button>
-            </div>
+<!-- LEARN -->
+<div class="card">
+<h2>📘 LEARN</h2>
+<p id="learnText"></p>
+<div id="learnMatrix" class="grid"></div>
+<button class="btn" onclick="nextLearn()">Next Concept</button>
+</div>
 
-            <div id="address-info" class="address-box">
-                Click an element above!
-            </div>
+<!-- PRACTICE -->
+<div class="card">
+<h2>🧠 PRACTICE</h2>
+<p>Identify the matrix type</p>
+<div id="practiceMatrix" class="grid"></div>
+<div id="options"></div>
+<p id="result"></p>
+<button class="btn" onclick="newPractice()">New Question</button>
+</div>
 
-            <div class="mnemonic">
-                💡 <b>Mnemonic:</b> रुँदा आँसु कसरी पुछिन्छ? (Horizontal ↔ = Row)
-            </div>
-        </div>
-    </div>
-
-    <div id="order" class="tab-content">
-        <div class="card">
-            <h2>How to find Order?</h2>
-            <p>Formula: <b>Rows × Columns</b></p>
-            <div class="matrix-view" id="order-preview">0 &nbsp; 0 &nbsp; 0 <br> 0 &nbsp; 0 &nbsp; 0</div>
-            <div style="display:flex; gap:10px; justify-content:center; align-items: center;">
-                <input type="number" id="rows" value="2" min="1" max="4" oninput="updateOrder()">
-                <span>×</span>
-                <input type="number" id="cols" value="3" min="1" max="4" oninput="updateOrder()">
-            </div>
-            <p id="order-text" style="text-align:center; color:var(--highlight); font-weight:bold; margin-top:15px;">Order: 2 × 3</p>
-        </div>
-    </div>
-
-    <div id="basic-types" class="tab-content">
-        <div class="grid">
-            <div class="card">
-                <span class="badge">1 × n</span>
-                <h3>Row Matrix</h3>
-                <div class="matrix-view">[ 1 &nbsp; 2 &nbsp; 3 ]</div>
-                <p>Only one horizontal line.</p>
-            </div>
-            <div class="card">
-                <span class="badge">m × 1</span>
-                <h3>Column Matrix</h3>
-                <div class="matrix-view">1 <br> 2 <br> 3</div>
-                <p>Only one vertical line.</p>
-            </div>
-            <div class="card">
-                <span class="badge">m = n</span>
-                <h3>Square Matrix</h3>
-                <div class="matrix-view">5 &nbsp; 6 <br> 7 &nbsp; 8</div>
-                <p>Rows and Columns are equal.</p>
-            </div>
-            <div class="card">
-                <span class="badge">Diagonal = 1</span>
-                <h3>Identity Matrix</h3>
-                <div class="matrix-view">1 &nbsp; 0 <br> 0 &nbsp; 1</div>
-                <p>Leading diagonal is all 1s.</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="advanced-types" class="tab-content">
-        <div class="grid">
-            <div class="card">
-                <h3>Transpose (Aᵀ)</h3>
-                <div class="matrix-view">[1 2] → [1]<br>[3 4] → [2]</div>
-                <p>Flip Rows into Columns.</p>
-                <div class="mnemonic">रुँदा आँसु पुछ्ने लाइनलाई उभ्याउने!</div>
-            </div>
-            <div class="card">
-                <h3>Singular Matrix</h3>
-                <div class="matrix-view">2 &nbsp; 4 <br> 1 &nbsp; 2</div>
-                <p>Determinant is ZERO (2×2 - 4×1 = 0).</p>
-            </div>
-            <div class="card">
-                <h3>Diagonal Matrix</h3>
-                <div class="matrix-view">5 &nbsp; 0 &nbsp; 0<br>0 &nbsp; 3 &nbsp; 0<br>0 &nbsp; 0 &nbsp; 9</div>
-                <p>Only the diagonal has numbers.</p>
-            </div>
-            <div class="card">
-                <h3>Null Matrix</h3>
-                <div class="matrix-view">0 &nbsp; 0 <br> 0 &nbsp; 0</div>
-                <p>All elements are zero.</p>
-            </div>
-        </div>
-    </div>
+<!-- GAME -->
+<div class="card">
+<h2>🎮 GAME MODE</h2>
+<p id="mission"></p>
+<div id="gameMatrix" class="grid"></div>
+<button class="btn" onclick="checkGame()">Submit</button>
+<p id="gameResult"></p>
+<button class="btn2" onclick="newGame()">New Mission</button>
 </div>
 
 <script>
-    function openTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        event.currentTarget.classList.add('active');
+
+/* ---------------- FULL SYLLABUS ---------------- */
+
+const topics = {
+    "Basic Shapes": [
+        { text:"Rectangular Matrix: m ≠ n", type:"Rectangular", mat:[[1,2,3],[4,5,6]] },
+        { text:"Square Matrix: m = n", type:"Square", mat:[[1,2],[3,4]] }
+    ],
+
+    "Special Matrices": [
+        { text:"Zero Matrix: all elements 0", type:"Zero", mat:[[0,0],[0,0]] },
+        { text:"Identity Matrix: diagonal = 1", type:"Identity", mat:[[1,0],[0,1]] },
+        { text:"Scalar Matrix: diagonal same value", type:"Scalar", mat:[[5,0],[0,5]] }
+    ],
+
+    "Structure Types": [
+        { text:"Diagonal Matrix: only diagonal non-zero", type:"Diagonal", mat:[[9,0],[0,3]] },
+        { text:"Upper Triangular: below diagonal = 0", type:"Upper", mat:[[1,2,3],[0,4,5],[0,0,6]] },
+        { text:"Lower Triangular: above diagonal = 0", type:"Lower", mat:[[1,0,0],[4,5,0],[7,8,9]] },
+        { text:"Symmetric: Aij = Aji", type:"Symmetric", mat:[[1,7],[7,1]] }
+    ]
+};
+
+let currentTopic = "Basic Shapes";
+let learnIndex = 0;
+let practiceAnswer = "";
+let gameData = null;
+
+/* ---------------- MENU ---------------- */
+
+function buildMenu(){
+    const menu = document.getElementById("menu");
+    menu.innerHTML = "";
+
+    Object.keys(topics).forEach(t => {
+        let b = document.createElement("button");
+        b.innerText = t;
+        b.onclick = () => {
+            currentTopic = t;
+            learnIndex = 0;
+            nextLearn();
+            newPractice();
+        };
+        menu.appendChild(b);
+    });
+}
+
+/* ---------------- RENDER ---------------- */
+
+function renderMatrix(id, mat){
+    const c = document.getElementById(id);
+    c.innerHTML = "";
+    c.style.gridTemplateColumns = `repeat(${mat[0].length},45px)`;
+
+    mat.forEach(row=>{
+        row.forEach(v=>{
+            let d = document.createElement("div");
+            d.className="cell";
+            d.innerText=v;
+            c.appendChild(d);
+        });
+    });
+}
+
+/* ---------------- LEARN ---------------- */
+
+function nextLearn(){
+    let data = topics[currentTopic];
+    let item = data[learnIndex];
+
+    document.getElementById("learnText").innerText = item.text;
+    renderMatrix("learnMatrix", item.mat);
+
+    learnIndex = (learnIndex + 1) % data.length;
+}
+
+/* ---------------- PRACTICE ---------------- */
+
+function newPractice(){
+    let pool = Object.values(topics).flat();
+    let q = pool[Math.floor(Math.random()*pool.length)];
+
+    practiceAnswer = q.type;
+    renderMatrix("practiceMatrix", q.mat);
+
+    let opt = [...new Set(pool.map(x=>x.type))];
+
+    document.getElementById("options").innerHTML =
+        opt.map(o=>`<button class="btn" onclick="check('${o}')">${o}</button>`).join("");
+}
+
+function check(ans){
+    let r = document.getElementById("result");
+
+    if(ans === practiceAnswer){
+        r.innerHTML="✔ Correct";
+        r.className="good";
+    } else {
+        r.innerHTML="✖ Wrong. Answer: "+practiceAnswer;
+        r.className="bad";
+    }
+}
+
+/* ---------------- GAME ---------------- */
+
+const missions = [
+    { text:"Fix system → must be Identity Matrix", target:"Identity", mat:[[1,2],[3,4]] },
+    { text:"Fix system → must be Zero Matrix", target:"Zero", mat:[[1,0],[0,0]] },
+    { text:"Fix system → must be Symmetric", target:"Symmetric", mat:[[1,9],[2,1]] },
+    { text:"Fix system → must be Diagonal", target:"Diagonal", mat:[[5,1],[0,3]] }
+];
+
+function newGame(){
+    gameData = missions[Math.floor(Math.random()*missions.length)];
+    document.getElementById("mission").innerText = gameData.text;
+    renderMatrix("gameMatrix", gameData.mat);
+    document.getElementById("gameResult").innerText="";
+}
+
+function checkGame(){
+    let m = gameData.mat;
+    let t = gameData.target;
+    let ok = false;
+
+    if(t==="Zero"){
+        ok = m.every(r=>r.every(v=>v===0));
+    }
+    else if(t==="Identity"){
+        ok = m.every((r,i)=>
+            r.every((v,j)=> i===j ? v===1 : v===0)
+        );
+    }
+    else if(t==="Symmetric"){
+        ok = m.every((r,i)=>
+            r.every((v,j)=> v===m[j][i])
+        );
+    }
+    else if(t==="Diagonal"){
+        ok = m.every((r,i)=>
+            r.every((v,j)=> i===j ? v!==0 : v===0)
+        );
     }
 
-    // New Address logic without Alert popups
-    function showAddress(r, c) {
-        const info = document.getElementById('address-info');
-        info.innerHTML = `<strong>Address a<sub>${r}${c}</sub>:</strong> Row ${r}, Column ${c}`;
-        info.style.color = "var(--highlight)";
-    }
+    document.getElementById("gameResult").innerHTML =
+        ok ? "✔ System Fixed" : "✖ Not Correct";
+}
 
-    function updateOrder() {
-        const r = document.getElementById('rows').value;
-        const c = document.getElementById('cols').value;
-        let html = "";
-        for(let i=0; i<r; i++) {
-            for(let j=0; j<c; j++) { html += "0 &nbsp; "; }
-            html += "<br>";
-        }
-        document.getElementById('order-preview').innerHTML = html;
-        document.getElementById('order-text').innerText = `Order: ${r} × ${c}`;
-    }
+/* ---------------- INIT ---------------- */
+
+buildMenu();
+nextLearn();
+newPractice();
+newGame();
+
 </script>
 
 </body>
