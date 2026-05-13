@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matrix Mastery: Complete Class 9 Guide</title>
+    <title>Matrix Mastery Dashboard</title>
     <style>
         :root {
             --primary: #8b5cf6;
@@ -25,10 +25,7 @@
             justify-content: center;
         }
 
-        .main-container {
-            width: 100%;
-            max-width: 1000px;
-        }
+        .main-container { width: 100%; max-width: 1000px; }
 
         .header {
             text-align: center;
@@ -106,6 +103,32 @@
             border-right: 3px solid var(--primary);
         }
 
+        /* Element Buttons */
+        .el-btn {
+            padding: 15px;
+            background: #1e293b;
+            border: 1px solid var(--border);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+        }
+        .el-btn:hover { background: var(--primary); }
+        .el-btn:active { transform: scale(0.95); }
+
+        .address-box {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid var(--highlight);
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .mnemonic {
             background: rgba(34, 211, 238, 0.1);
             color: var(--highlight);
@@ -126,6 +149,7 @@
         }
 
         sub { font-size: 0.7em; }
+        input { width: 60px; padding: 8px; border-radius: 5px; border: 1px solid var(--primary); background: #0f172a; color: white; text-align: center; }
     </style>
 </head>
 <body>
@@ -146,13 +170,19 @@
     <div id="intro" class="tab-content active">
         <div class="card" style="text-align:center;">
             <h2>The a<sub>ij</sub> Address</h2>
-            <p>Click to identify the Row and Column positions.</p>
+            <p>Click an element to see its Row and Column position.</p>
+            
             <div style="display:inline-grid; grid-template-columns: repeat(2, 80px); gap: 15px; background:#0f172a; padding:25px; border-radius:10px; border-left:4px solid var(--primary); border-right:4px solid var(--primary);">
-                <button onclick="alert('a11: Row 1, Column 1')" style="padding:15px; cursor:pointer;">a<sub>11</sub></button>
-                <button onclick="alert('a12: Row 1, Column 2')" style="padding:15px; cursor:pointer;">a<sub>12</sub></button>
-                <button onclick="alert('a21: Row 2, Column 1')" style="padding:15px; cursor:pointer;">a<sub>21</sub></button>
-                <button onclick="alert('a22: Row 2, Column 2')" style="padding:15px; cursor:pointer;">a<sub>22</sub></button>
+                <button class="el-btn" onclick="showAddress(1,1)">a<sub>11</sub></button>
+                <button class="el-btn" onclick="showAddress(1,2)">a<sub>12</sub></button>
+                <button class="el-btn" onclick="showAddress(2,1)">a<sub>21</sub></button>
+                <button class="el-btn" onclick="showAddress(2,2)">a<sub>22</sub></button>
             </div>
+
+            <div id="address-info" class="address-box">
+                Click an element above!
+            </div>
+
             <div class="mnemonic">
                 💡 <b>Mnemonic:</b> रुँदा आँसु कसरी पुछिन्छ? (Horizontal ↔ = Row)
             </div>
@@ -163,10 +193,8 @@
         <div class="card">
             <h2>How to find Order?</h2>
             <p>Formula: <b>Rows × Columns</b></p>
-            <div class="matrix-view" id="order-preview">
-                0 &nbsp; 0 &nbsp; 0 <br> 0 &nbsp; 0 &nbsp; 0
-            </div>
-            <div style="display:flex; gap:10px; justify-content:center;">
+            <div class="matrix-view" id="order-preview">0 &nbsp; 0 &nbsp; 0 <br> 0 &nbsp; 0 &nbsp; 0</div>
+            <div style="display:flex; gap:10px; justify-content:center; align-items: center;">
                 <input type="number" id="rows" value="2" min="1" max="4" oninput="updateOrder()">
                 <span>×</span>
                 <input type="number" id="cols" value="3" min="1" max="4" oninput="updateOrder()">
@@ -237,6 +265,13 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
         event.currentTarget.classList.add('active');
+    }
+
+    // New Address logic without Alert popups
+    function showAddress(r, c) {
+        const info = document.getElementById('address-info');
+        info.innerHTML = `<strong>Address a<sub>${r}${c}</sub>:</strong> Row ${r}, Column ${c}`;
+        info.style.color = "var(--highlight)";
     }
 
     function updateOrder() {
