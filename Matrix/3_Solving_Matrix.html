@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Types of Matrix</title>
+
+<style>
+body {
+    font-family: Arial;
+    background:#0f172a;
+    color:#e2e8f0;
+    text-align:center;
+    margin:0;
+    padding:20px;
+}
+
+.card {
+    background:#1e293b;
+    padding:20px;
+    margin:15px auto;
+    border-radius:12px;
+    max-width:800px;
+}
+
+.grid {
+    display:grid;
+    justify-content:center;
+    gap:5px;
+    margin:15px auto;
+}
+
+.cell {
+    width:45px;
+    height:45px;
+    background:#334155;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+    border-radius:6px;
+}
+
+button {
+    padding:10px 14px;
+    margin:5px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.btn { background:#6366f1; color:white; }
+.btn2 { background:#0ea5e9; color:white; }
+.good { color:#10b981; }
+.bad { color:#ef4444; }
+
+.menu {
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:8px;
+    margin-bottom:15px;
+}
+
+.menu button {
+    background:#334155;
+    color:white;
+}
+.menu button:hover {
+    background:#475569;
+}
+</style>
+</head>
+
+<body>
+
+<h1>📘 MATRIX LEARNING OS v3</h1>
+
+<!-- TOPIC MENU -->
+<div class="card">
+<h2>📚 Choose What to Learn</h2>
+<div class="menu" id="menu"></div>
+</div>
+
+<!-- LEARN -->
+<div class="card">
+<h2>📘 LEARN</h2>
+<p id="learnText"></p>
+<div id="learnMatrix" class="grid"></div>
+<button class="btn" onclick="nextLearn()">Next Concept</button>
+</div>
+
+<!-- PRACTICE -->
+<div class="card">
+<h2>🧠 PRACTICE</h2>
+<p>Identify the matrix type</p>
+<div id="practiceMatrix" class="grid"></div>
+<div id="options"></div>
+<p id="result"></p>
+<button class="btn" onclick="newPractice()">New Question</button>
+</div>
+
+<!-- GAME -->
+<div class="card">
+<h2>🎮 GAME MODE</h2>
+<p id="mission"></p>
+<div id="gameMatrix" class="grid"></div>
+<button class="btn" onclick="checkGame()">Submit</button>
+<p id="gameResult"></p>
+<button class="btn2" onclick="newGame()">New Mission</button>
+</div>
+
+<script>
+
+/* ---------------- FULL SYLLABUS ---------------- */
+
+const topics = {
+    "Basic Shapes": [
+        { text:"Rectangular Matrix: m ≠ n", type:"Rectangular", mat:[[1,2,3],[4,5,6]] },
+        { text:"Square Matrix: m = n", type:"Square", mat:[[1,2],[3,4]] }
+    ],
+
+    "Special Matrices": [
+        { text:"Zero Matrix: all elements 0", type:"Zero", mat:[[0,0],[0,0]] },
+        { text:"Identity Matrix: diagonal = 1", type:"Identity", mat:[[1,0],[0,1]] },
+        { text:"Scalar Matrix: diagonal same value", type:"Scalar", mat:[[5,0],[0,5]] }
+    ],
+
+    "Structure Types": [
+        { text:"Diagonal Matrix: only diagonal non-zero", type:"Diagonal", mat:[[9,0],[0,3]] },
+        { text:"Upper Triangular: below diagonal = 0", type:"Upper", mat:[[1,2,3],[0,4,5],[0,0,6]] },
+        { text:"Lower Triangular: above diagonal = 0", type:"Lower", mat:[[1,0,0],[4,5,0],[7,8,9]] },
+        { text:"Symmetric: Aij = Aji", type:"Symmetric", mat:[[1,7],[7,1]] }
+    ]
+};
+
+let currentTopic = "Basic Shapes";
+let learnIndex = 0;
+let practiceAnswer = "";
+let gameData = null;
+
+/* ---------------- MENU ---------------- */
+
+function buildMenu(){
+    const menu = document.getElementById("menu");
+    menu.innerHTML = "";
+
+    Object.keys(topics).forEach(t => {
+        let b = document.createElement("button");
+        b.innerText = t;
+        b.onclick = () => {
+            currentTopic = t;
+            learnIndex = 0;
+            nextLearn();
+            newPractice();
+        };
+        menu.appendChild(b);
+    });
+}
+
+/* ---------------- RENDER ---------------- */
+
+function renderMatrix(id, mat){
+    const c = document.getElementById(id);
+    c.innerHTML = "";
+    c.style.gridTemplateColumns = `repeat(${mat[0].length},45px)`;
+
+    mat.forEach(row=>{
+        row.forEach(v=>{
+            let d = document.createElement("div");
+            d.className="cell";
+            d.innerText=v;
+            c.appendChild(d);
+        });
+    });
+}
+
+/* ---------------- LEARN ---------------- */
+
+function nextLearn(){
+    let data = topics[currentTopic];
+    let item = data[learnIndex];
+
+    document.getElementById("learnText").innerText = item.text;
+    renderMatrix("learnMatrix", item.mat);
+
+    learnIndex = (learnIndex + 1) % data.length;
+}
+
+/* ---------------- PRACTICE ---------------- */
+
+function newPractice(){
+    let pool = Object.values(topics).flat();
+    let q = pool[Math.floor(Math.random()*pool.length)];
+
+    practiceAnswer = q.type;
+    renderMatrix("practiceMatrix", q.mat);
+
+    let opt = [...new Set(pool.map(x=>x.type))];
+
+    document.getElementById("options").innerHTML =
+        opt.map(o=>`<button class="btn" onclick="check('${o}')">${o}</button>`).join("");
+}
+
+function check(ans){
+    let r = document.getElementById("result");
+
+    if(ans === practiceAnswer){
+        r.innerHTML="✔ Correct";
+        r.className="good";
+    } else {
+        r.innerHTML="✖ Wrong. Answer: "+practiceAnswer;
+        r.className="bad";
+    }
+}
+
+/* ---------------- GAME ---------------- */
+
+const missions = [
+    { text:"Fix system → must be Identity Matrix", target:"Identity", mat:[[1,2],[3,4]] },
+    { text:"Fix system → must be Zero Matrix", target:"Zero", mat:[[1,0],[0,0]] },
+    { text:"Fix system → must be Symmetric", target:"Symmetric", mat:[[1,9],[2,1]] },
+    { text:"Fix system → must be Diagonal", target:"Diagonal", mat:[[5,1],[0,3]] }
+];
+
+function newGame(){
+    gameData = missions[Math.floor(Math.random()*missions.length)];
+    document.getElementById("mission").innerText = gameData.text;
+    renderMatrix("gameMatrix", gameData.mat);
+    document.getElementById("gameResult").innerText="";
+}
+
+function checkGame(){
+    let m = gameData.mat;
+    let t = gameData.target;
+    let ok = false;
+
+    if(t==="Zero"){
+        ok = m.every(r=>r.every(v=>v===0));
+    }
+    else if(t==="Identity"){
+        ok = m.every((r,i)=>
+            r.every((v,j)=> i===j ? v===1 : v===0)
+        );
+    }
+    else if(t==="Symmetric"){
+        ok = m.every((r,i)=>
+            r.every((v,j)=> v===m[j][i])
+        );
+    }
+    else if(t==="Diagonal"){
+        ok = m.every((r,i)=>
+            r.every((v,j)=> i===j ? v!==0 : v===0)
+        );
+    }
+
+    document.getElementById("gameResult").innerHTML =
+        ok ? "✔ System Fixed" : "✖ Not Correct";
+}
+
+/* ---------------- INIT ---------------- */
+
+buildMenu();
+nextLearn();
+newPractice();
+newGame();
+
+</script>
+
+</body>
+</html>
