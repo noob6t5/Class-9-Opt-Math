@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VectorVerse Physics Lab</title>
+
+<style>
+:root{
+--primary:#4f46e5;
+--secondary:#0891b2;
+--success:#16a34a;
+--warning:#ea580c;
+--danger:#ef4444;
+--bg:#f8fafc;
+--card:#ffffff;
+--text:#1e293b;
+}
+
+*{
+box-sizing:border-box;
+}
+
+body{
+margin:0;
+padding:20px;
+background:var(--bg);
+font-family:Segoe UI,sans-serif;
+color:var(--text);
+}
+
+.container{
+max-width:850px;
+margin:auto;
+}
+
+header{
+background:linear-gradient(135deg,var(--primary),var(--secondary));
+color:white;
+padding:25px;
+border-radius:20px;
+text-align:center;
+margin-bottom:25px;
+}
+
+header h1{
+margin:0;
+font-size:2.5rem;
+}
+
+.tabs{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+justify-content:center;
+margin-bottom:25px;
+}
+
+.tab-btn{
+padding:12px 20px;
+border:none;
+border-radius:12px;
+cursor:pointer;
+font-weight:bold;
+background:#e2e8f0;
+color: var(--text);
+transition:.2s;
+}
+
+.tab-btn.active{
+background:var(--primary);
+color:white;
+}
+
+.tab-section {
+display: none;
+}
+
+.tab-section.active {
+display: block;
+}
+
+.card{
+background:white;
+padding:25px;
+border-radius:18px;
+margin-bottom:25px;
+box-shadow:0 5px 20px rgba(0,0,0,.05);
+}
+
+.controls{
+display:flex;
+gap:15px;
+flex-wrap:wrap;
+justify-content:center;
+align-items:center;
+background:#f1f5f9;
+padding:15px;
+border-radius:14px;
+margin-top:20px;
+}
+
+.control-group{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.character-select {
+display: flex;
+gap: 15px;
+justify-content: center;
+margin-bottom: 15px;
+}
+
+.char-btn {
+padding: 10px 20px;
+border: 2px solid #cbd5e1;
+background: white;
+border-radius: 12px;
+cursor: pointer;
+font-weight: bold;
+font-size: 1rem;
+transition: 0.2s;
+}
+
+.char-btn.selected {
+border-color: var(--primary);
+background: #eeebff;
+color: var(--primary);
+transform: scale(1.05);
+}
+
+.game-status-bar {
+display: flex;
+justify-content: space-around;
+background: #1e293b;
+color: white;
+padding: 12px;
+border-radius: 12px;
+margin-bottom: 15px;
+font-weight: bold;
+font-size: 1.1rem;
+}
+
+.timer-alert {
+color: var(--danger);
+animation: blink 1s infinite alternate;
+}
+
+@keyframes blink {
+0% { opacity: 1; }
+100% { opacity: 0.4; }
+}
+
+.keypad-container {
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 20px;
+background: #f8fafc;
+padding: 15px;
+border-radius: 14px;
+border: 1px solid #e2e8f0;
+margin-top: 15px;
+}
+
+.keypad-column {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 8px;
+}
+
+.keypad-label {
+font-weight: bold;
+color: var(--text);
+margin-bottom: 4px;
+}
+
+.keypad-row {
+display: flex;
+gap: 6px;
+justify-content: center;
+flex-wrap: wrap;
+}
+
+.key-btn {
+background: white;
+border: 1px solid #cbd5e1;
+padding: 10px 14px;
+border-radius: 8px;
+font-weight: bold;
+cursor: pointer;
+user-select: none;
+transition: 0.1s;
+min-width: 42px;
+text-align: center;
+}
+
+.key-btn:active {
+background: var(--primary);
+color: white;
+transform: scale(0.95);
+}
+
+.key-btn.step-btn {
+background: #e2e8f0;
+color: var(--text);
+}
+
+button.action-btn {
+background:var(--primary);
+color:white;
+border:none;
+padding:12px 18px;
+border-radius:10px;
+cursor:pointer;
+font-weight:bold;
+}
+
+button.action-btn:hover{
+background:#4338ca;
+}
+
+input[type=number]{
+width:75px;
+padding:8px;
+border-radius:8px;
+border:1px solid #cbd5e1;
+text-align:center;
+font-size: 1rem;
+}
+
+canvas{
+border-radius:16px;
+max-width: 100%;
+display: block;
+margin: 0 auto;
+}
+
+#vectorCanvas{
+background:white;
+border:2px solid #e2e8f0;
+}
+
+#physicsCanvas, #magCanvas{
+background:linear-gradient(to bottom,#0f172a,#1e293b);
+border:2px solid #334155;
+}
+
+.types-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit, minmax(220px,1fr));
+gap:20px;
+margin-top:20px;
+}
+
+.type-box{
+padding:18px;
+border-radius:14px;
+border:1px solid #e2e8f0;
+background:#f8fafc;
+cursor:pointer;
+transition:.2s;
+}
+
+.matrix{
+display:inline-flex;
+font-family:monospace;
+font-weight:bold;
+margin-top:10px;
+vertical-align: middle;
+}
+
+.matrix-brackets{
+border-left:2px solid black;
+border-right:2px solid black;
+padding:0 8px;
+display:flex;
+flex-direction:column;
+align-items:center;
+}
+
+.stats{
+font-weight:bold;
+text-align:center;
+margin-top:15px;
+color:var(--primary);
+font-size: 1.1rem;
+}
+
+.feedback-text{
+text-align:center;
+font-size:1.4rem;
+font-weight:bold;
+margin-top:15px;
+min-height: 35px;
+}
+
+.app-footer {
+text-align: center;
+margin-top: 40px;
+font-size: 0.9rem;
+color: #64748b;
+border-top: 1px solid #e2e8f0;
+padding-top: 20px;
+}
+
+@media(max-width:700px){
+.controls, .keypad-container{
+grid-template-columns: 1fr;
+flex-direction:column;
+}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+<h1>🚀 VectorVerse</h1>
+<p>Interactive Math Sandbox for Class 9</p>
+</header>
+
+<div class="tabs">
+<button class="tab-btn active" onclick="showTab(event,'intro')">📘 Intro</button>
+<button class="tab-btn" onclick="showTab(event,'playground')">🎮 Playground</button>
+<button class="tab-btn" onclick="showTab(event,'types')">🎯 Types</button>
+<button class="tab-btn" onclick="showTab(event,'physics')">🏆 Position Challenge</button>
+<button class="tab-btn" onclick="showTab(event,'magnitudeTab')">📐 Magnitude Challenge</button>
+</div>
+
+<div id="intro" class="tab-section active">
+<div class="card">
+<h2>What is a Vector?</h2>
+<p>Unlike regular scalar numbers (like mass or temperature), a vector contains two vital pieces of data:</p>
+<ul>
+<li><strong>Magnitude:</strong> The absolute size, length, or speed of the line.</li>
+<li><strong>Direction:</strong> Where the line is pointing through dimensional space.</li>
+</ul>
+<p style="font-size:1.2rem;">
+Vector notation: 
+<span class="matrix">
+<span class="matrix-brackets">
+<span>x</span>
+<span>y</span>
+</span>
+</span>
+</p>
+<ul>
+<li><strong>x component:</strong> Horizontal path adjustments (+ Right, - Left)</li>
+<li><strong>y component:</strong> Vertical elevation height shifts (+ Up, - Down)</li>
+</ul>
+</div>
+
+<div class="card" style="background: #f0fdf4; border: 1px solid #bbf7d0;">
+<h2>💡 Why Learn Vectors and Magnitude?</h2>
+<p>Vectors aren't just equations on graph paper—they run the modern interactive systems we use daily:</p>
+<ul>
+<li><strong>🎮 Video Game Development:</strong> Every time you move a joystick, the engine calculates a <em>Position Vector</em> to determine your speed and direction. When a character fires a projectile, <strong>magnitude</strong> sets how fast the blast travels across the screen!</li>
+<li><strong>🛰️ GPS & Aerospace Engineering:</strong> Satellites and planes never rely on addresses. They map destinations using precise 3D vector forces to fight shifting crosswinds.</li>
+<li><strong>🏹 Physics and Force Mechanics:</strong> Whether tracking how hard a cricketer hits a ball or evaluating the structural integrity of a suspension bridge, you must solve for combined vector forces to prevent collapse.</li>
+</ul>
+<h3>How Magnitude is Calculated:</h3>
+<p>By treating the components $x$ and $y$ as sides of a right-angled triangle, we use the <strong>Pythagorean Theorem</strong> to find the straight-line distance (Magnitude $|\vec{r}|$):</p>
+<p style="font-size: 1.25rem; font-family: monospace; text-align: center; background: white; padding: 10px; border-radius: 8px; font-weight: bold; border: 1px solid #cbd5e1;">
+    Magnitude = √(x² + y²)
+</p>
+</div>
+</div>
+
+<div id="playground" class="tab-section">
+<div class="card">
+<h2>🎮 Vector Playground</h2>
+<canvas id="vectorCanvas" width="450" height="450"></canvas>
+<div class="controls">
+<div class="control-group">
+<label><b>X Component:</b></label>
+<input type="number" id="vecX" value="4" min="-8" max="8">
+</div>
+<div class="control-group">
+<label><b>Y Component:</b></label>
+<input type="number" id="vecY" value="3" min="-8" max="8">
+</div>
+<button class="action-btn" onclick="animateVector()">Animate Trace 🎬</button>
+</div>
+<p id="vectorStats" class="stats"></p>
+</div>
+</div>
+
+<div id="types" class="tab-section">
+<div class="card">
+<h2>🎯 Types of Vectors</h2>
+<div class="types-grid">
+<div class="type-box" onclick="loadPreset(0,0)">
+<h3>Zero Vector</h3>
+<div class="matrix"><span class="matrix-brackets"><span>0</span><span>0</span></span></div>
+</div>
+<div class="type-box" onclick="loadPreset(1,0)">
+<h3>Unit Vector</h3>
+<div class="matrix"><span class="matrix-brackets"><span>1</span><span>0</span></span></div>
+</div>
+<div class="type-box" onclick="loadPreset(5,5)">
+<h3>Equal Vector</h3>
+<div class="matrix"><span class="matrix-brackets"><span>5</span><span>5</span></span></div>
+</div>
+<div class="type-box" onclick="loadPreset(-4,-3)">
+<h3>Negative Vector</h3>
+<div class="matrix"><span class="matrix-brackets"><span>-4</span><span>-3</span></span></div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="physics" class="tab-section">
+<div class="card">
+<h2>🏆 Game 1: Position Vector Challenge</h2>
+<p>Analyze the grid intersections to discover the target's coordinates, modify the vector components, and launch from the origin (0,0)!</p>
+
+<div class="character-select">
+<button class="char-btn selected" onclick="selectCharacter('ninja', '#22c55e', '🥷 Ninja')">🥷 Ninja</button>
+<button class="char-btn" onclick="selectCharacter('robot', '#06b6d4', '🤖 Robot')">🤖 Robot</button>
+<button class="char-btn" onclick="selectCharacter('wizard', '#a855f7', '🧙 Wizard')">🧙 Wizard</button>
+</div>
+
+<div class="game-status-bar">
+<div>Hero: <span class="lblCharName">🥷 Ninja</span></div>
+<div>Time: <span id="lblTimer">60s</span></div>
+<div>Score: <span id="lblScore" style="color: var(--success);">0</span></div>
+</div>
+
+<canvas id="physicsCanvas" width="500" height="520"></canvas>
+
+<div class="controls" style="padding: 20px;">
+    <div style="font-size: 1.2rem; font-weight: bold; margin-right: 10px;">Vector r = </div>
+    <div class="matrix" style="font-size: 1.2rem; margin-right: 20px;">
+        <span class="matrix-brackets" style="border-width: 3px; padding: 5px 10px;">
+            <input type="number" id="forceX" value="5" min="-12" max="12" readonly style="margin-bottom: 5px; font-weight: bold;">
+            <input type="number" id="forceY" value="5" min="-12" max="12" readonly style="font-weight: bold;">
+        </span>
+    </div>
+    <button class="action-btn" id="btnLaunch" onclick="launchPhysicsBall()">🚀 Apply Position Vector</button>
+    <button class="action-btn" style="background: var(--warning);" onclick="startNewGame()">🎮 Start Game</button>
+</div>
+
+<div class="keypad-container">
+    <div class="keypad-column">
+        <div class="keypad-label">➡️ Adjust Horizontal Component (x)</div>
+        <div class="keypad-row">
+            <button class="key-btn step-btn" onclick="adjustValue('forceX', -1)">-1</button>
+            <button class="key-btn step-btn" onclick="adjustValue('forceX', 1)">+1</button>
+        </div>
+        <div class="keypad-row" style="margin-top: 5px;">
+            <button class="key-btn" onclick="setValue('forceX', 2)">2</button>
+            <button class="key-btn" onclick="setValue('forceX', 4)">4</button>
+            <button class="key-btn" onclick="setValue('forceX', 6)">6</button>
+            <button class="key-btn" onclick="setValue('forceX', 8)">8</button>
+            <button class="key-btn" onclick="setValue('forceX', 10)">10</button>
+        </div>
+    </div>
+    
+    <div class="keypad-column">
+        <div class="keypad-label">🔼 Adjust Vertical Component (y)</div>
+        <div class="keypad-row">
+            <button class="key-btn step-btn" onclick="adjustValue('forceY', -1)">-1</button>
+            <button class="key-btn step-btn" onclick="adjustValue('forceY', 1)">+1</button>
+        </div>
+        <div class="keypad-row" style="margin-top: 5px;">
+            <button class="key-btn" onclick="setValue('forceY', 2)">2</button>
+            <button class="key-btn" onclick="setValue('forceY', 4)">4</button>
+            <button class="key-btn" onclick="setValue('forceY', 6)">6</button>
+            <button class="key-btn" onclick="setValue('forceY', 8)">8</button>
+            <button class="key-btn" onclick="setValue('forceY', 10)">10</button>
+        </div>
+    </div>
+</div>
+<p id="physicsFeedback" class="feedback-text"></p>
+</div>
+</div>
+
+<div id="magnitudeTab" class="tab-section">
+<div class="card" style="border: 2px solid var(--secondary);">
+<h2>📐 Game 2: The Magnitude Challenge</h2>
+<p style="color: #475569; font-style: italic;">Prepared by Sangharsha Upadhyaya</p>
+<p><strong>Rule:</strong> The vector direction angle is locked. The system shows you the components. You must calculate the missing straight-line hypotenuse length (<strong>Magnitude</strong>) to stretch the vector directly onto the red target!</p>
+
+<div class="game-status-bar" style="background: #0f172a;">
+<div>Hero: <span class="lblCharName">🥷 Ninja</span></div>
+<div>Score: <span id="lblMagScore" style="color: #22d3ee;">0</span></div>
+</div>
+
+<canvas id="magCanvas" width="500" height="520"></canvas>
+
+<div class="controls" style="background: #ecfeff;">
+    <div class="control-group">
+        <span style="font-weight:bold; font-size: 1.1rem;">Given Vector Base Triangle:</span>
+        <span id="lblTriangleSpecs" style="background:white; padding: 6px 12px; border-radius: 6px; font-family: monospace; font-weight:bold; border: 1px solid #cbd5e1;">X = ?, Y = ?</span>
+    </div>
+    <div class="control-group">
+        <label><b>Your Magnitude Input:</b></label>
+        <input type="number" id="txtMagInput" step="0.1" value="5.0" style="width: 90px; border-color: var(--secondary);">
+    </div>
+    <button class="action-btn" style="background: var(--secondary);" onclick="launchMagnitudeBall()">⚡ Fire Magnitude Probe</button>
+    <button class="action-btn" style="background: #0891b2;" onclick="startMagGame()">🎮 Next Target</button>
+</div>
+
+<div class="keypad-container" style="grid-template-columns: 1fr;">
+    <div class="keypad-column">
+        <div class="keypad-label">🔢 Fast Magnitude Touch-Pad Entry</div>
+        <div class="keypad-row">
+            <button class="key-btn step-btn" onclick="adjustMagValue(-1)">-1.0</button>
+            <button class="key-btn step-btn" onclick="adjustMagValue(-0.1)">-0.1</button>
+            <button class="key-btn step-btn" onclick="adjustMagValue(0.1)">+0.1</button>
+            <button class="key-btn step-btn" onclick="adjustMagValue(1)">+1.0</button>
+        </div>
+        <div class="keypad-row" style="margin-top: 5px;">
+            <button class="key-btn" onclick="setMagValue(5.0)">5.0 (3,4 triangle)</button>
+            <button class="key-btn" onclick="setMagValue(10.0)">10.0 (6,8 triangle)</button>
+            <button class="key-btn" onclick="setMagValue(13.0)">13.0 (5,12 triangle)</button>
+            <button class="key-btn" onclick="setMagValue(7.1)">7.1 (5,5 triangle)</button>
+            <button class="key-btn" onclick="setMagValue(8.5)">8.5 (6,6 triangle)</button>
+        </div>
+    </div>
+</div>
+<p id="magFeedback" class="feedback-text" style="color: var(--secondary);"></p>
+</div>
+</div>
+
+<footer class="app-footer">
+    <p><strong>VectorVerse Lab Engine</strong> - Released under MIT Open-Source License.</p>
+    <p>Contributions by: Sangharsha Upadhyaya & Community Core Architects.</p>
+</footer>
+
+</div>
+
+<script>
+// Tab Swapping Controller
+function showTab(event, tabId) {
+    document.querySelectorAll('.tab-section').forEach(section => section.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    if(event) event.target.classList.add('active');
+    
+    if (tabId === 'playground') updateVisualization();
+    if (tabId === 'magnitudeTab' && !magGameActive) startMagGame();
+}
+
+// Global Character Sync System
+let currentHeroColor = '#22c55e';
+function selectCharacter(charId, themeColor, nameString) {
+    document.querySelectorAll('.char-btn').forEach(b => b.classList.remove('selected'));
+    if(event) event.target.classList.add('selected');
+    currentHeroColor = themeColor;
+    document.querySelectorAll('.lblCharName').forEach(el => el.innerText = nameString);
+}
+
+// --- TAB 2: PLAYGROUND FRAME ENGINE ---
+const canvas = document.getElementById('vectorCanvas');
+const ctx = canvas.getContext('2d');
+const gridSize = 25;
+const originX = canvas.width / 2;
+const originY = canvas.height / 2;
+let animationProgress = 100;
+
+function drawArrow(context, fromx, fromy, tox, toy, color, width = 3) {
+    const dx = tox - fromx; const dy = toy - fromy;
+    if (Math.hypot(dx, dy) < 0.01) return;
+    const angle = Math.atan2(dy, dx); const headlen = 10;
+    context.strokeStyle = color; context.fillStyle = color; context.lineWidth = width;
+    context.beginPath(); context.moveTo(fromx, fromy); context.lineTo(tox, toy); context.stroke();
+    context.beginPath(); context.moveTo(tox, toy);
+    context.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+    context.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+    context.closePath(); context.fill();
+}
+
+function drawGrid() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+    for (let x = 0; x <= canvas.width; x += gridSize) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke(); }
+    for (let y = 0; y <= canvas.height; y += gridSize) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke(); }
+    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(canvas.width, originY); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(originX, 0); ctx.lineTo(originX, canvas.height); ctx.stroke();
+}
+
+function updateVisualization() {
+    const x = Number(document.getElementById('vecX').value) || 0;
+    const y = Number(document.getElementById('vecY').value) || 0;
+    drawGrid();
+    const factor = animationProgress / 100;
+    const px = originX + x * gridSize * factor; const py = originY - y * gridSize * factor;
+    if (x === 0 && y === 0) {
+        ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(originX, originY, 6, 0, Math.PI * 2); ctx.fill();
+    } else {
+        drawArrow(ctx, originX, originY, px, py, '#4f46e5', 4);
+    }
+    document.getElementById('vectorStats').innerHTML = `Matrix notation: [${x} over ${y}] &nbsp;|&nbsp; Absolute Magnitude: ${Math.sqrt(x*x+y*y).toFixed(2)}`;
+}
+
+function animateVector() {
+    animationProgress = 0;
+    function frame() {
+        if (animationProgress < 100) { animationProgress += 4; updateVisualization(); requestAnimationFrame(frame); }
+        else { animationProgress = 100; updateVisualization(); }
+    }
+    frame();
+}
+
+function loadPreset(x, y) {
+    document.getElementById('vecX').value = x; document.getElementById('vecY').value = y;
+    document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('playground').classList.add('active');
+    animateVector();
+}
+document.getElementById('vecX').addEventListener('input', updateVisualization);
+document.getElementById('vecY').addEventListener('input', updateVisualization);
+updateVisualization();
+
+
+// --- TAB 4: GAME 1 ENGINE (POSITION CHALLENGE) ---
+const physicsCanvas = document.getElementById('physicsCanvas');
+const physCtx = physicsCanvas.getContext('2d');
+
+const graphSize = 35; 
+const startGridX = 50; 
+const startGridY = 450; 
+
+let physicsBall = null;
+let physicsTarget = { mathX: 0, mathY: 0, r: 16 };
+let gameScore = 0; let timeLeft = 60; let gameTimerInterval = null; let gameActive = false;
+
+function adjustValue(inputId, change) {
+    const input = document.getElementById(inputId);
+    let val = (Number(input.value) || 0) + change;
+    if (val > 12) val = 12; if (val < -12) val = -12; 
+    input.value = val;
+}
+function setValue(inputId, value) { document.getElementById(inputId).value = value; }
+
+function randomizeTarget() {
+    physicsTarget.mathX = Math.floor(Math.random() * (12 - 2) + 2); 
+    physicsTarget.mathY = Math.floor(Math.random() * (11 - 2) + 2);
+}
+
+function startNewGame() {
+    clearInterval(gameTimerInterval);
+    gameScore = 0; timeLeft = 60; gameActive = true;
+    randomizeTarget(); physicsBall = null;
+    document.getElementById('lblScore').innerText = gameScore;
+    document.getElementById('lblTimer').innerText = timeLeft + "s";
+    document.getElementById('physicsFeedback').innerText = 'Target active! Read its location grid steps.';
+    document.getElementById('physicsFeedback').style.color = 'var(--primary)';
+    
+    gameTimerInterval = setInterval(() => {
+        timeLeft--; document.getElementById('lblTimer').innerText = timeLeft + "s";
+        if (timeLeft <= 0) {
+            clearInterval(gameTimerInterval); gameActive = false; physicsBall = null;
+            document.getElementById('physicsFeedback').innerText = `🏆 Game Over! Final Score: ${gameScore} Hits!`;
+            document.getElementById('physicsFeedback').style.color = 'var(--warning)';
+        }
+    }, 1000);
+}
+
+function launchPhysicsBall() {
+    if(!gameActive) return;
+    if(physicsBall && physicsBall.active) return;
+
+    const rawVx = Number(document.getElementById('forceX').value) || 0;
+    const rawVy = Number(document.getElementById('forceY').value) || 0;
+
+    physicsBall = {
+        x: startGridX, y: startGridY,
+        displayVx: rawVx, displayVy: rawVy,
+        active: true, progress: 0
+    };
+}
+
+function drawPhysicsWorld() {
+    physCtx.clearRect(0, 0, physicsCanvas.width, physicsCanvas.height);
+    physCtx.lineWidth = 1; physCtx.font = '12px monospace';
+    
+    for (let i = 0; i <= 12; i++) {
+        let screenX = startGridX + (i * graphSize);
+        let screenY = startGridY - (i * graphSize);
+
+        physCtx.strokeStyle = (i === 0) ? '#94a3b8' : 'rgba(255, 255, 255, 0.08)';
+        physCtx.beginPath(); physCtx.moveTo(screenX, 20); physCtx.lineTo(screenX, startGridY); physCtx.stroke();
+        physCtx.fillStyle = '#94a3b8'; physCtx.fillText(i, screenX - 4, startGridY + 20);
+
+        physCtx.beginPath(); physCtx.moveTo(startGridX, screenY); physCtx.lineTo(480, screenY); physCtx.stroke();
+        if (i > 0) physCtx.fillText(i, startGridX - 25, screenY + 4);
+    }
+
+    physCtx.fillStyle = '#1e293b'; physCtx.fillRect(0, startGridY + 35, physicsCanvas.width, 40);
+    physCtx.fillStyle = currentHeroColor; physCtx.fillRect(startGridX - 10, startGridY - 10, 20, 20); 
+
+    if (gameActive) {
+        let targetX = startGridX + (physicsTarget.mathX * graphSize);
+        let targetY = startGridY - (physicsTarget.mathY * graphSize);
+        physCtx.fillStyle = '#ef4444'; physCtx.beginPath(); physCtx.arc(targetX, targetY, physicsTarget.r, 0, Math.PI * 2); physCtx.fill();
+        physCtx.strokeStyle = 'white'; physCtx.lineWidth = 2; physCtx.stroke();
+    }
+
+    if (physicsBall && physicsBall.active) {
+        physicsBall.progress += 0.025;
+        let currentX = startGridX + (physicsBall.displayVx * graphSize * physicsBall.progress);
+        let currentY = startGridY - (physicsBall.displayVy * graphSize * physicsBall.progress);
+
+        physCtx.strokeStyle = currentHeroColor; physCtx.lineWidth = 3; physCtx.setLineDash([4, 4]);
+        physCtx.beginPath(); physCtx.moveTo(startGridX, startGridY); physCtx.lineTo(currentX, currentY); physCtx.stroke();
+        physCtx.setLineDash([]);
+
+        physCtx.fillStyle = '#facc15'; physCtx.beginPath(); physCtx.arc(currentX, currentY, 8, 0, Math.PI * 2); physCtx.fill();
+
+        if (physicsBall.progress >= 1.0) {
+            physicsBall.active = false;
+            if (physicsBall.displayVx === physicsTarget.mathX && physicsBall.displayVy === physicsTarget.mathY) {
+                gameScore++; document.getElementById('lblScore').innerText = gameScore;
+                document.getElementById('physicsFeedback').innerText = '🎯 PERFECT POSITION VECTOR MATCH!';
+                document.getElementById('physicsFeedback').style.color = 'var(--success)';
+                randomizeTarget();
+            } else {
+                document.getElementById('physicsFeedback').innerText = `❌ Missed! You hit point (${physicsBall.displayVx}, ${physicsBall.displayVy}).`;
+                document.getElementById('physicsFeedback').style.color = 'var(--danger)';
+            }
+        }
+    } else if (!gameActive) {
+        physCtx.fillStyle = 'rgba(255,255,255,0.4)'; physCtx.font = '16px sans-serif';
+        physCtx.fillText('Click "Start Game" to begin!', 150, 220);
+    }
+    requestAnimationFrame(drawPhysicsWorld);
+}
+drawPhysicsWorld();
+
+
+// --- TAB 5: MAGNITUDE GAME CONTROLLER (BY SANGHARSHA UPADHYAYA) ---
+const magCanvas = document.getElementById('magCanvas');
+const magCtx = magCanvas.getContext('2d');
+
+let magGameActive = false;
+let magScore = 0;
+let magTargetTriangle = { x: 0, y: 0, trueMagnitude: 0 };
+let magProbe = null;
+
+function adjustMagValue(change) {
+    const input = document.getElementById('txtMagInput');
+    let v = (parseFloat(input.value) || 0) + change;
+    input.value = Math.max(0, Math.min(20, v)).toFixed(1);
+}
+function setMagValue(val) { document.getElementById('txtMagInput').value = val.toFixed(1); }
+
+function startMagGame() {
+    magGameActive = true;
+    magProbe = null;
+    document.getElementById('magFeedback').innerText = 'New Target Set! Calculate the hypotenuse vector length.';
+    document.getElementById('magFeedback').style.color = 'var(--text)';
+
+    // Choose from structured Pythagorean variants for Class 9 capability boundaries
+    const presets = [
+        {x: 3, y: 4}, {x: 6, y: 8}, {x: 5, y: 12}, 
+        {x: 8, y: 6}, {x: 4, y: 3}, {x: 5, y: 5}, {x: 6, y: 6}
+    ];
+    const picked = presets[Math.floor(Math.random() * presets.length)];
+    
+    magTargetTriangle.x = picked.x;
+    magTargetTriangle.y = picked.y;
+    magTargetTriangle.trueMagnitude = Math.sqrt(picked.x * picked.x + picked.y * picked.y);
+    
+    document.getElementById('lblTriangleSpecs').innerText = `Component Δx = ${picked.x}, Δy = ${picked.y}`;
+}
+
+function launchMagnitudeBall() {
+    if(!magGameActive || (magProbe && magProbe.active)) return;
+    
+    const userMagInput = parseFloat(document.getElementById('txtMagInput').value) || 0;
+    
+    magProbe = {
+        startX: startGridX,
+        startY: startGridY,
+        targetX: startGridX + (magTargetTriangle.x * graphSize),
+        targetY: startGridY - (magTargetTriangle.y * graphSize),
+        userMag: userMagInput,
+        trueMag: magTargetTriangle.trueMagnitude,
+        progress: 0,
+        active: true
+    };
+}
+
+function drawMagnitudeWorld() {
+    magCtx.clearRect(0, 0, magCanvas.width, magCanvas.height);
+    magCtx.lineWidth = 1; magCtx.font = '12px monospace';
+
+    // Grid rendering layers
+    for (let i = 0; i <= 12; i++) {
+        let screenX = startGridX + (i * graphSize);
+        let screenY = startGridY - (i * graphSize);
+        magCtx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+        magCtx.beginPath(); magCtx.moveTo(screenX, 20); magCtx.lineTo(screenX, startGridY); magCtx.stroke();
+        magCtx.beginPath(); magCtx.moveTo(startGridX, screenY); magCtx.lineTo(480, screenY); magCtx.stroke();
+        magCtx.fillStyle = '#64748b';
+        magCtx.fillText(i, screenX - 4, startGridY + 18);
+        if(i > 0) magCtx.fillText(i, startGridX - 22, screenY + 4);
+    }
+
+    // Launch Pad
+    magCtx.fillStyle = '#334155'; magCtx.fillRect(0, startGridY + 35, magCanvas.width, 40);
+    magCtx.fillStyle = currentHeroColor; magCtx.fillRect(startGridX - 10, startGridY - 10, 20, 20);
+
+    if (magGameActive) {
+        let tx = startGridX + (magTargetTriangle.x * graphSize);
+        let ty = startGridY - (magTargetTriangle.y * graphSize);
+
+        // Vector Guideline Components
+        magCtx.strokeStyle = 'rgba(234, 88, 12, 0.4)'; magCtx.lineWidth = 2;
+        magCtx.beginPath(); magCtx.moveTo(startGridX, startGridY); magCtx.lineTo(tx, startGridY); magCtx.lineTo(tx, ty); magCtx.stroke();
+
+        // Target Ring Node
+        magCtx.fillStyle = '#06b6d4'; magCtx.beginPath(); magCtx.arc(tx, ty, 16, 0, Math.PI * 2); magCtx.fill();
+        magCtx.strokeStyle = 'white'; magCtx.lineWidth = 2; magCtx.stroke();
+    }
+
+    if (magProbe && magProbe.active) {
+        magProbe.progress += 0.025;
+        
+        // Dynamic stretching calculation: line shortens or overshoots based on user input accuracy factor
+        let accuracyScale = magProbe.userMag / magProbe.trueMag;
+        let finalMaxX = startGridX + ((magProbe.targetX - startGridX) * accuracyScale);
+        let finalMaxY = startGridY + ((magProbe.targetY - startGridY) * accuracyScale);
+
+        let currentX = startGridX + ((finalMaxX - startGridX) * magProbe.progress);
+        let currentY = startGridY + ((finalMaxY - startGridY) * magProbe.progress);
+
+        magCtx.strokeStyle = '#facc15'; magCtx.lineWidth = 3;
+        magCtx.beginPath(); magCtx.moveTo(startGridX, startGridY); magCtx.lineTo(currentX, currentY); magCtx.stroke();
+
+        magCtx.fillStyle = '#facc15'; magCtx.beginPath(); magCtx.arc(currentX, currentY, 8, 0, Math.PI * 2); magCtx.fill();
+
+        if (magProbe.progress >= 1.0) {
+            magProbe.active = false;
+            let difference = Math.abs(magProbe.userMag - magProbe.trueMag);
+
+            // Give credit for close approximations (e.g. 7.1 instead of 7.07)
+            if (difference <= 0.15) {
+                magScore++;
+                document.getElementById('lblMagScore').innerText = magScore;
+                document.getElementById('magFeedback').innerText = `🎯 EXCELLENT! Calculated: ${magProbe.trueMag.toFixed(2)}. Your entry: ${magProbe.userMag}`;
+                document.getElementById('magFeedback').style.color = 'var(--success)';
+                startMagGame();
+            } else {
+                document.getElementById('magFeedback').innerText = `❌ Incorrect Magnitude! The correct vector hypotenuse distance was ${magProbe.trueMag.toFixed(2)}.`;
+                document.getElementById('magFeedback').style.color = 'var(--danger)';
+            }
+        }
+    }
+    requestAnimationFrame(drawMagnitudeWorld);
+}
+drawMagnitudeWorld();
+</script>
+
+</body>
+</html>
