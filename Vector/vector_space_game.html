@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vector Jump: Sector Navigator</title>
+    <title>Vector Jump: Rapid-Fire Navigator</title>
     <style>
         body {
             margin: 0;
@@ -40,7 +40,7 @@
             background: #090d16;
             border: 2px solid #334155;
             border-radius: 8px;
-            padding: 15px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -59,14 +59,25 @@
             font-size: 1.4rem;
             text-transform: uppercase;
             letter-spacing: 2px;
-            color: #f43f5e;
+            color: #e11d48;
             text-shadow: 0 0 8px rgba(244, 63, 94, 0.5);
+        }
+
+        .hud-meta {
+            display: flex;
+            justify-content: space-between;
+            background: #1e293b;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            border: 1px solid #334155;
         }
 
         .sub-tag {
             background: #3b82f6;
             color: white;
-            padding: 2px 8px;
+            padding: 4px 8px;
             border-radius: 4px;
             font-size: 0.75rem;
             font-weight: bold;
@@ -79,12 +90,13 @@
             line-height: 1.6;
             color: #94a3b8;
             margin-bottom: 15px;
+            min-height: 120px;
         }
 
         .highlight { color: #38bdf8; font-weight: bold; }
         .target { color: #22c55e; font-weight: bold; }
+        .reference { color: #eab308; font-weight: bold; }
 
-        /* Clean styling for vector vector representation overhead arrows */
         .vec-arrow {
             position: relative;
             display: inline-block;
@@ -104,9 +116,8 @@
             background: #1e293b;
             border: 2px solid #0284c7;
             border-radius: 8px;
-            padding: 15px;
+            padding: 20px;
             text-align: center;
-            margin-bottom: 15px;
         }
 
         .matrix-bracket {
@@ -155,28 +166,31 @@
             border-radius: 4px;
             width: 100%;
             transition: background 0.2s;
+            margin-bottom: 10px;
         }
 
         button:hover { background: #e11d48; }
 
-        #log {
-            height: 90px;
-            overflow-y: auto;
-            background: #020617;
-            border: 1px solid #334155;
+        #feedback-banner {
+            font-size: 0.9rem;
+            font-weight: bold;
             padding: 8px;
-            font-size: 0.8rem;
-            color: #22c55e;
             border-radius: 4px;
+            text-align: center;
+            min-height: 20px;
             line-height: 1.4;
         }
+        
+        .fb-neutral { color: #64748b; background: transparent; }
+        .fb-success { color: #22c55e; background: rgba(34, 197, 94, 0.1); border: 1px solid #22c55e; }
+        .fb-error { color: #f43f5e; background: rgba(244, 63, 94, 0.1); border: 1px solid #f43f5e; }
     </style>
 </head>
 <body>
 
 <div style="text-align: center; margin-bottom: 20px;">
-    <h2 style="margin:0 0 5px 0; color:#fff;">🌌 VECTOR FLIGHT TRAINING SIMULATOR</h2>
-    <p style="margin:0; color:#94a3b8;">Infinite algorithmic random modules generated to master curriculum tracking parameters.</p>
+    <h2 style="margin:0 0 5px 0; color:#fff;">⚡ RAPID-FIRE VECTOR FLIGHT SIMULATOR</h2>
+    <p style="margin:0; color:#94a3b8;">Master coordinate curriculum geometry with non-spoiler visual loop feedback.</p>
 </div>
 
 <div id="game-container">
@@ -186,11 +200,13 @@
 
     <div class="screen-panel">
         <div>
+            <div class="hud-meta">
+                <span>SCORE: <span id="game-score" style="color:#22c55e; font-weight:bold;">0</span></span>
+                <span>STREAK: <span id="game-streak" style="color:#eab308; font-weight:bold;">0</span> 🔥</span>
+            </div>
             <h1>Mission Systems Panel</h1>
             <div class="sub-tag" id="exercise-tag">LOADING TRAINING PROTOCOLS...</div>
-            <div class="hud-data" id="objective-desc">
-                Initializing drive sequences...
-            </div>
+            <div class="hud-data" id="objective-desc">Initializing drive sequences...</div>
         </div>
 
         <div class="vector-input-bay">
@@ -203,12 +219,8 @@
                 </div>
                 ]
             </div>
-            <button onclick="engageWarp()">Engage Warp Drive</button>
-        </div>
-
-        <div>
-            <div style="font-size:0.8rem; margin-bottom:4px; color:#64748b;">COMMUNICATIONS CHANNEL LOG:</div>
-            <div id="log">>> Standby for sector allocation initialization parameters...</div>
+            <button id="warp-btn" onclick="engageWarp()">Verify Trajectory Vector</button>
+            <div id="feedback-banner" class="fb-neutral">System ready for telemetry coordinates...</div>
         </div>
     </div>
 </div>
@@ -217,48 +229,73 @@
     const canvas = document.getElementById('radar');
     const ctx = canvas.getContext('2d');
     
+    let score = 0;
+    let streak = 0;
     let ship = {x: 0, y: 0};
     let target = {x: 0, y: 0};
+    let referenceVector = null; 
     let currentMissionType = 0; 
     let hiddenData = {};
+    let isLocked = false;
+    let currentStateShowCorrect = false;
+    let currentStatePlayerAttempt = null;
+    
+    document.getElementById('vecX').addEventListener('keypress', function(e) { if(e.key === 'Enter') engageWarp(); });
+    document.getElementById('vecY').addEventListener('keypress', function(e) { if(e.key === 'Enter') engageWarp(); });
+
+    function randNonZero(min, max) {
+        let val = 0;
+        while(val === 0) {
+            val = Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        return val;
+    }
 
     function initMission() {
-        // Randomly pull across the core syllabus questions types
+        isLocked = false;
+        referenceVector = null;
+        currentStateShowCorrect = false;
+        currentStatePlayerAttempt = null;
+
+        document.getElementById('vecX').disabled = false;
+        document.getElementById('vecY').disabled = false;
+        document.getElementById('warp-btn').disabled = false;
+        
         currentMissionType = Math.floor(Math.random() * 3);
         document.getElementById('vecX').value = '';
         document.getElementById('vecY').value = '';
         
-        // Setup coordinates
-        ship.x = Math.floor(Math.random() * 14) - 7;
-        ship.y = Math.floor(Math.random() * 14) - 7;
-        
-        let targetX = Math.floor(Math.random() * 14) - 7;
-        let targetY = Math.floor(Math.random() * 14) - 7;
-        while(targetX === ship.x && targetY === ship.y) {
-            targetX = Math.floor(Math.random() * 14) - 7;
-        }
-        target.x = targetX;
-        target.y = targetY;
+        document.getElementById('feedback-banner').className = "fb-neutral";
+        document.getElementById('feedback-banner').innerText = "System ready for telemetry coordinates...";
 
-        let dx = target.x - ship.x;
-        let dy = target.y - ship.y;
+        let dx = randNonZero(-5, 5);
+        let dy = randNonZero(-5, 5);
+
+        let minX = dx > 0 ? -7 : -7 - dx;
+        let maxX = dx > 0 ? 7 - dx : 7;
+        let minY = dy > 0 ? -7 : -7 - dy;
+        let maxY = dy > 0 ? 7 - dy : 7;
+
+        ship.x = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
+        ship.y = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
+        
+        target.x = ship.x + dx;
+        target.y = ship.y + dy;
 
         const desc = document.getElementById('objective-desc');
         const tag = document.getElementById('exercise-tag');
         const labelText = document.getElementById('input-label-text');
 
         if (currentMissionType === 0) {
-            // Textbook Questions 4 & 5
-            tag.innerText = "CRURRICULUM MODE: QUESTIONS 4 & 5 (FIND VECTOR components)";
+            tag.innerText = "MODE: QUESTIONS 4 & 5 (FIND VECTOR COMPONENTS)";
             labelText.innerText = "ENTER DISPLACEMENT VECTOR COMPONENTS:";
             desc.innerHTML = `Our ship is positioned at point <span class="highlight">A(${ship.x}, ${ship.y})</span>.<br>
             The sector goal coordinates are locked at <span class="target">B(${target.x}, ${target.y})</span>.<br><br>
-            Calculate and input the movement column vector <span class="vec-arrow">AB</span> to navigate to the target zone.`;
+            Calculate and input the movement column vector <span class="vec-arrow">AB</span> to safely navigate to the target zone.`;
             hiddenData = { ansX: dx, ansY: dy };
         } 
         else if (currentMissionType === 1) {
-            // Textbook Questions 6 & 7
-            tag.innerText = "CRURRICULUM MODE: QUESTIONS 6 & 7 (FIND UNKNOWN COORDINATES)";
+            tag.innerText = "MODE: QUESTIONS 6 & 7 (FIND COORDINATES)";
             labelText.innerText = "ENTER TARGET DESTINATION COORDINATES (x, y):";
             desc.innerHTML = `Our ship starts operations at point <span class="highlight">P(${ship.x}, ${ship.y})</span>.<br>
             Engine telemetry sets a locked movement jump trajectory vector of <span class="vec-arrow">PQ</span> = <span class="highlight">[${dx}, ${dy}]</span>.<br><br>
@@ -266,22 +303,43 @@
             hiddenData = { ansX: target.x, ansY: target.y };
         }
         else {
-            // Textbook Questions 8 & 9
-            tag.innerText = "CRURRICULUM MODE: QUESTIONS 8 & 9 (VECTOR EQUALITY MATRICES)";
-            labelText.innerText = "ENTER DESIRED ENDPOINT LOCATION (x, y):";
+            tag.innerText = "MODE: QUESTIONS 8 & 9 (VECTOR EQUALITY)";
+            labelText.innerText = "ENTER YOUR ENDPOINT LOCATION (x, y):";
             
-            let refX1 = Math.floor(Math.random() * 6) - 3;
-            let refY1 = Math.floor(Math.random() * 6) - 3;
+            let rMinX = dx > 0 ? -7 : -7 - dx;
+            let rMaxX = dx > 0 ? 7 - dx : 7;
+            let rMinY = dy > 0 ? -7 : -7 - dy;
+            let rMaxY = dy > 0 ? 7 - dy : 7;
+
+            let refX1 = Math.floor(Math.random() * (rMaxX - rMinX + 1)) + rMinX;
+            let refY1 = Math.floor(Math.random() * (rMaxY - rMinY + 1)) + rMinY;
+            
+            if (Math.abs(refX1 - ship.x) < 2) refX1 = refX1 > 0 ? refX1 - 3 : refX1 + 3;
+
             let refX2 = refX1 + dx;
             let refY2 = refY1 + dy;
 
-            desc.innerHTML = `An allied explorer is tracing a route vector <span class="vec-arrow">CD</span> from C(${refX1}, ${refY1}) to D(${refX2}, ${refY2}).<br>
+            referenceVector = { x1: refX1, y1: refY1, x2: refX2, y2: refY2 };
+
+            desc.innerHTML = `An allied explorer traces an exact route vector <span class="vec-arrow">CD</span> from <span class="reference">C(${refX1}, ${refY1})</span> to <span class="reference">D(${refX2}, ${refY2})</span>.<br>
             Your ship is deployed at location <span class="highlight">A(${ship.x}, ${ship.y})</span>.<br><br>
-            To match their path identically (<span class="vec-arrow">AB</span> = <span class="vec-arrow">CD</span>), what must be your final endpoint destination coordinates <span class="target">B(x, y)</span>?`;
+            To match their trajectory vector identically (<span class="vec-arrow">AB</span> = <span class="vec-arrow">CD</span>), compute your final endpoint destination coordinates <span class="target">B(x, y)</span>.`;
             hiddenData = { ansX: target.x, ansY: target.y };
         }
-
+        
         drawRadar();
+        document.getElementById('vecX').focus();
+    }
+
+    function drawArrowhead(x1, y1, x2, y2, color) {
+        const headLength = 10; 
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - headLength * Math.cos(angle - Math.PI / 6), y2 - headLength * Math.sin(angle - Math.PI / 6));
+        ctx.lineTo(x2 - headLength * Math.cos(angle + Math.PI / 6), y2 - headLength * Math.sin(angle + Math.PI / 6));
+        ctx.fill();
     }
 
     function drawRadar() {
@@ -290,80 +348,161 @@
         const center = canvas.width / 2;
         const scale = canvas.width / 18; 
 
-        // Draw grid squares
+        // Draw grid lines
         ctx.strokeStyle = '#1e293b';
         ctx.lineWidth = 1;
         for(let i = -9; i <= 9; i++) {
-            ctx.beginPath();
-            ctx.moveTo(center + i * scale, 0);
-            ctx.lineTo(center + i * scale, canvas.height);
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.moveTo(0, center + i * scale);
-            ctx.lineTo(canvas.width, center + i * scale);
-            ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(center + i * scale, 0); ctx.lineTo(center + i * scale, canvas.height); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(0, center + i * scale); ctx.lineTo(canvas.width, center + i * scale); ctx.stroke();
         }
 
-        // Draw axis channels
+        // Draw structural axes
         ctx.strokeStyle = '#334155';
         ctx.lineWidth = 2;
         ctx.beginPath(); ctx.moveTo(center, 0); ctx.lineTo(center, canvas.height); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(0, center); ctx.lineTo(canvas.width, center); ctx.stroke();
 
-        // Draw Cruiser Unit
-        ctx.fillStyle = '#38bdf8';
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = '#38bdf8';
-        ctx.beginPath();
         let sX = center + ship.x * scale;
         let sY = center - ship.y * scale;
-        ctx.arc(sX, sY, 7, 0, Math.PI * 2);
-        ctx.fill();
+        let tX = center + target.x * scale;
+        let tY = center - target.y * scale;
+
+        // Draw equality system helper vectors
+        if (referenceVector) {
+            let cx1 = center + referenceVector.x1 * scale;
+            let cy1 = center - referenceVector.y1 * scale;
+            let cx2 = center + referenceVector.x2 * scale;
+            let cy2 = center - referenceVector.y2 * scale;
+
+            ctx.strokeStyle = '#eab308'; 
+            ctx.lineWidth = 2.5;
+            ctx.beginPath(); ctx.moveTo(cx1, cy1); ctx.lineTo(cx2, cy2); ctx.stroke();
+            drawArrowhead(cx1, cy1, cx2, cy2, '#eab308');
+
+            ctx.fillStyle = '#eab308';
+            ctx.beginPath(); ctx.arc(cx1, cy1, 4, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(cx2, cy2, 4, 0, Math.PI * 2); ctx.fill();
+            ctx.font = '10px monospace'; ctx.fillStyle = '#fff';
+            ctx.fillText(`C(${referenceVector.x1},${referenceVector.y1})`, cx1 - 15, cy1 - 8);
+            ctx.fillText(`D(${referenceVector.x2},${referenceVector.y2})`, cx2 + 8, cy2 - 4);
+        }
+
+        // Plot custom invalid user attempts
+        if (currentStatePlayerAttempt) {
+            let pEndX = center + currentStatePlayerAttempt.x * scale;
+            let pEndY = center - currentStatePlayerAttempt.y * scale;
+
+            ctx.strokeStyle = '#f43f5e'; 
+            ctx.lineWidth = 3;
+            ctx.setLineDash([5, 5]); 
+            ctx.beginPath(); ctx.moveTo(sX, sY); ctx.lineTo(pEndX, pEndY); ctx.stroke();
+            ctx.setLineDash([]); 
+            drawArrowhead(sX, sY, pEndX, pEndY, '#f43f5e');
+
+            ctx.fillStyle = '#f43f5e';
+            ctx.beginPath(); ctx.arc(pEndX, pEndY, 5, 0, Math.PI * 2); ctx.fill();
+            ctx.font = '10px monospace'; ctx.fillStyle = '#fff';
+            
+            if (currentMissionType === 0) {
+                ctx.fillText(`YOUR VECTOR [${currentStatePlayerAttempt.rawX}, ${currentStatePlayerAttempt.rawY}]`, pEndX + 10, pEndY + 12);
+            } else {
+                ctx.fillText(`YOUR COORDS (${currentStatePlayerAttempt.rawX}, ${currentStatePlayerAttempt.rawY})`, pEndX + 10, pEndY + 12);
+            }
+        }
+
+        // Display exact track configurations
+        if (currentStateShowCorrect) {
+            ctx.strokeStyle = '#22c55e'; 
+            ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(sX, sY); ctx.lineTo(tX, tY); ctx.stroke();
+            drawArrowhead(sX, sY, tX, tY, '#22c55e');
+
+            ctx.fillStyle = '#22c55e';
+            ctx.beginPath(); ctx.arc(tX, tY, 6, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 11px monospace';
+            
+            if (isLocked || currentMissionType === 0) {
+                let labelText = (currentMissionType === 0) ? `B(${target.x}, ${target.y})` : (currentMissionType === 1 ? `Q(${target.x}, ${target.y})` : `B(${target.x}, ${target.y})`);
+                ctx.fillText(labelText, tX + 12, tY - 4);
+            } else {
+                ctx.fillText(`CORRECT TRAJECTORY (Count grid units)`, tX + 12, tY - 4);
+            }
+        }
+
+        if (currentMissionType === 0 && !currentStateShowCorrect) {
+            ctx.fillStyle = '#22c55e';
+            ctx.beginPath(); ctx.arc(tX, tY, 6, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 11px monospace';
+            ctx.fillText(`B(${target.x}, ${target.y})`, tX + 12, tY - 4);
+        }
+
+        // Draw Player Unit Node Base
+        ctx.fillStyle = '#38bdf8';
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = '#38bdf8';
+        ctx.beginPath(); ctx.arc(sX, sY, 7, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = '#fff';
         ctx.font = 'bold 11px monospace';
-        ctx.fillText(`START (${ship.x}, ${ship.y})`, sX + 12, sY - 4);
-
-        // Hide objective coordinate destination dots during specific unknown challenge tracks to avoid cheating
-        if(currentMissionType === 0) {
-            ctx.fillStyle = '#22c55e';
-            ctx.shadowColor = '#22c55e';
-            ctx.beginPath();
-            let tX = center + target.x * scale;
-            let tY = center - target.y * scale;
-            ctx.arc(tX, tY, 7, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillText(`GOAL (${target.x}, ${target.y})`, tX + 12, tY - 4);
-        }
+        let label = (currentMissionType === 0 || currentMissionType === 2) ? 'A' : 'P';
+        ctx.fillText(`${label}(${ship.x}, ${ship.y})`, sX + 12, sY - 4);
+        
         ctx.shadowBlur = 0; 
     }
 
     function engageWarp() {
+        if(isLocked) return;
+
         const uX = parseInt(document.getElementById('vecX').value);
         const uY = parseInt(document.getElementById('vecY').value);
-        const log = document.getElementById('log');
+        const feedback = document.getElementById('feedback-banner');
 
         if(isNaN(uX) || isNaN(uY)) {
-            log.innerHTML = `>> <span style="color: #f43f5e;">CRITICAL INPUT ALERT: System matrices require numerical fields populated!</span><br>` + log.innerHTML;
+            feedback.className = "fb-error";
+            feedback.innerText = "System matrices require numerical fields populated!";
             return;
         }
 
-        if(uX === hiddenData.ansX && uY === hiddenData.ansY) {
-            log.innerHTML = `>> <span style="color: #22c55e;">WARP DRIVE ENGAGED: Coordinates matched. Trajectory successful! Loading next quadrant coordinates...</span><br>` + log.innerHTML;
-            
-            // Draw vector trail trajectory path 
-            const center = canvas.width / 2;
-            const scale = canvas.width / 18;
-            ctx.strokeStyle = '#f43f5e';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.moveTo(center + ship.x * scale, center - ship.y * scale);
-            ctx.lineTo(center + target.x * scale, center - target.y * scale);
-            ctx.stroke();
+        let userAbsoluteTargetX = 0;
+        let userAbsoluteTargetY = 0;
 
-            setTimeout(initMission, 2000);
+        if (currentMissionType === 0) {
+            userAbsoluteTargetX = ship.x + uX;
+            userAbsoluteTargetY = ship.y + uY;
         } else {
-            log.innerHTML = `>> <span style="color: #f43f5e;">TRAJECTORY ERR: Command entry variables do not match vector vectors equations. recalculate and execute safely.</span><br>` + log.innerHTML;
+            userAbsoluteTargetX = uX;
+            userAbsoluteTargetY = uY;
+        }
+
+        if(uX === hiddenData.ansX && uY === hiddenData.ansY) {
+            isLocked = true;
+            score += 10;
+            streak += 1;
+            document.getElementById('game-score').innerText = score;
+            document.getElementById('game-streak').innerText = streak;
+
+            feedback.className = "fb-success";
+            feedback.innerText = "🚀 TRAJECTORY ALIGNED: Warp successful! Jump logged.";
+            
+            currentStateShowCorrect = true;
+            currentStatePlayerAttempt = null;
+            drawRadar();
+            
+            document.getElementById('vecX').disabled = true;
+            document.getElementById('vecY').disabled = true;
+            document.getElementById('warp-btn').disabled = true;
+
+            setTimeout(initMission, 2200);
+        } else {
+            streak = 0;
+            document.getElementById('game-streak').innerText = streak;
+            feedback.className = "fb-error";
+            feedback.innerText = "⚠️ DEFLECTION DETECTED: Vector off-course. Fix your parameters using the green ghost trajectory guide!";
+            
+            currentStateShowCorrect = true; 
+            currentStatePlayerAttempt = { x: userAbsoluteTargetX, y: userAbsoluteTargetY, rawX: uX, rawY: uY };
+            drawRadar();
         }
     }
 
