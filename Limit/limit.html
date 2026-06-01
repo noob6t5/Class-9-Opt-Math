@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class 9 Optional Math: Limits & Continuity</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --lhl: #dc2626;
+            --rhl: #16a34a;
+            --fx-color: #7c3aed;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            padding: 20px;
+            color: #1e293b;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        header {
+            text-align: center;
+            padding: 35px 20px;
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: white;
+        }
+        h1 { margin: 0; font-size: 2.4rem; }
+
+        .section {
+            padding: 28px;
+        }
+
+        .concept-box {
+            background: #f0f9ff;
+            padding: 24px;
+            border-radius: 12px;
+            border-left: 6px solid var(--primary);
+            margin-bottom: 25px;
+            line-height: 1.7;
+        }
+
+        .road-analogy {
+            background: #fefce8;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 5px solid #ca8a04;
+            margin: 20px 0;
+            font-size: 1.05rem;
+        }
+
+        .interactive {
+            display: grid;
+            grid-template-columns: 1fr 460px;
+            gap: 30px;
+            padding: 25px;
+        }
+        @media (max-width: 950px) {
+            .interactive { grid-template-columns: 1fr; }
+        }
+
+        canvas {
+            width: 100%;
+            background: #0f172a;
+            border-radius: 12px;
+        }
+
+        .controls {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label { font-weight: 600; margin: 5px 0; display: block; }
+
+        .slider { width: 100%; height: 10px; border-radius: 5px; cursor: pointer;}
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        th, td {
+            padding: 8px 6px;
+            border: 1px solid #cbd5e1;
+            text-align: center;
+        }
+        th { background: #e2e8f0; }
+        .lhl { background: #fee2e2; color: #991b1b; }
+        .rhl { background: #dcfce7; color: #166534; }
+        .hole { background: #f3e8ff; font-weight: bold; color: #6b21a8; }
+
+        .explanation {
+            background: #eff6ff;
+            padding: 22px;
+            border-radius: 10px;
+            line-height: 1.75;
+            font-size: 1.05rem;
+        }
+
+        .continuity-card {
+            background: #fff;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .badge-fail { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+        .badge-wait { background: #fef3c7; color: #d97706; border: 1px solid #fcd34d; }
+
+        .highlight {
+            background: #fef3c7;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Understanding Limits & Continuity</h1>
+        <p class="subtitle">Class 9 Optional Mathematics Interactive Module</p>
+    </header>
+
+    <div class="section concept-box">
+        <h3>🎯 What is a Limit?</h3>
+        <p>A <strong>limit</strong> answers: <strong>"Where is the function heading?"</strong></p>
+        
+        <div class="road-analogy">
+            <strong>🚗 Road Analogy for Limit:</strong><br><br>
+            You only care where the road is heading as you approach a location.<br>
+            Even if there's a missing brick exactly at that location, you can still tell where the road is going.
+        </div>
+        
+        <p>The limit can <strong>exist</strong> even if the function is undefined at that exact point.</p>
+    </div>
+
+    <div class="section concept-box">
+        <h3>📍 Left Hand Limit (LHL) & Right Hand Limit (RHL)</h3>
+        <p><strong>LHL (👈 From Left):</strong> What value does \(f(x)\) approach as \(x\) gets closer to 3 from values <strong>less than 3</strong>?</p>
+        <p><strong>RHL (👉 From Right):</strong> What value does \(f(x)\) approach as \(x\) gets closer to 3 from values <strong>greater than 3</strong>?</p>
+        
+        <p>When <strong>LHL = RHL</strong>, we say the overall limit exists.</p>
+    </div>
+
+    <div class="section concept-box">
+        <h3>🔄 Continuity (The Grand Test)</h3>
+        <div class="road-analogy">
+            <strong>🚧 Road Analogy for Continuity:</strong><br><br>
+            Now you care whether the road is actually complete at that location.<br>
+            If there's a hole, jump, or break, continuity fails.
+        </div>
+        <p>For a function to be <strong>continuous</strong> at a point \(x = a\), it must pass 3 strict conditions:</p>
+        <ol style="margin-top: 10px;">
+            <li>The overall limit must exist: \(\lim_{x \to a} f(x) \text{ exists (i.e., LHL = RHL)}\)</li>
+            <li>The function must be defined at that point: \(f(a) \text{ must exist}\)</li>
+            <li>The limit and the exact value must match perfectly: \(\lim_{x \to a} f(x) = f(a)\)</li>
+        </ol>
+    </div>
+
+    <div class="interactive">
+        <div>
+            <h3>Interactive Graph: \(f(x) = \frac{x^2 - 9}{x - 3}\)</h3>
+            <canvas id="canvas" width="620" height="440"></canvas>
+            <p style="text-align:center; margin-top:10px; color:#64748b;">
+                Drag the slider on the right to walk toward \(x = 3\) from both directions!
+            </p>
+        </div>
+
+        <div class="controls">
+            <label>Move closer to \(x = 3\): <span id="currentX" style="color:#2563eb; font-size:1.25rem;">2.50</span></label>
+            <input type="range" id="slider" min="2.0" max="4.0" step="0.01" value="2.5" class="slider">
+
+            <h4>📊 Numerical Table Method</h4>
+            <table id="table">
+                <thead>
+                    <tr>
+                        <th>Direction</th>
+                        <th>x Value</th>
+                        <th>f(x) Output</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+
+            <div id="limitExplanation" class="explanation"></div>
+
+            <div class="continuity-card" id="checklistCard">
+                </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const slider = document.getElementById('slider');
+    const currentXEl = document.getElementById('currentX');
+    const tableBody = document.getElementById('tableBody');
+    const limitExplanation = document.getElementById('limitExplanation');
+    const checklistCard = document.getElementById('checklistCard');
+
+    function cx(x) { return 90 + (x - 3) * 110; }
+    function cy(y) { return 340 - y * 42; }
+
+    function drawGraph(activeX) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Grid lines
+        ctx.strokeStyle = '#222938';
+        ctx.lineWidth = 1;
+        for (let i = -5; i <= 10; i++) {
+            ctx.beginPath(); ctx.moveTo(cx(i), 0); ctx.lineTo(cx(i), canvas.height); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(0, cy(i)); ctx.lineTo(canvas.width, cy(i)); ctx.stroke();
+        }
+
+        // Axes
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(0, 340); ctx.lineTo(canvas.width, 340);
+        ctx.moveTo(90, 0); ctx.lineTo(90, canvas.height);
+        ctx.stroke();
+
+        // Main function line (y = x + 3)
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(cx(1), cy(4));
+        ctx.lineTo(cx(5), cy(8));
+        ctx.stroke();
+
+        // Target Empty Circle Hole at (3,6)
+        ctx.fillStyle = '#0f172a';
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(cx(3), cy(6), 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Active Pointer Point
+        if (Math.abs(activeX - 3) > 0.005) {
+            ctx.fillStyle = activeX < 3 ? '#dc2626' : '#16a34a';
+            ctx.beginPath();
+            ctx.arc(cx(activeX), cy(activeX + 3), 9, 0, Math.PI * 2);
+            ctx.fill();
+        } else {
+            // Center alignment dot when tracking center hole
+            ctx.fillStyle = '#7c3aed';
+            ctx.beginPath();
+            ctx.arc(cx(3), cy(6), 7, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    function updateTable(x) {
+        tableBody.innerHTML = '';
+        const closeness = [0.1, 0.01, 0.001];
+
+        // Left Hand Limit Values
+        closeness.forEach(d => {
+            const val = (3 - d).toFixed(3);
+            const fx = (parseFloat(val) + 3).toFixed(3);
+            tableBody.innerHTML += `
+                <tr class="lhl">
+                    <td>👈 LHL Approach</td>
+                    <td>${val}</td>
+                    <td>${fx}</td>
+                </tr>`;
+        });
+
+        // Exact Middle Row
+        tableBody.innerHTML += `
+            <tr class="hole">
+                <td>🎯 Exact Center</td>
+                <td>3.000</td>
+                <td>UNDEFINED (0/0)</td>
+            </tr>`;
+
+        // Right Hand Limit Values
+        closeness.reverse().forEach(d => {
+            const val = (3 + d).toFixed(3);
+            const fx = (parseFloat(val) + 3).toFixed(3);
+            tableBody.innerHTML += `
+                <tr class="rhl">
+                    <td>👉 RHL Approach</td>
+                    <td>${val}</td>
+                    <td>${fx}</td>
+                </tr>`;
+        });
+    }
+
+    function updateExplanationAndChecklist(x) {
+        currentXEl.textContent = x.toFixed(2);
+        
+        if (Math.abs(x - 3) < 0.01) {
+            // AT THE HOLE: Reveal the full final failure analysis
+            limitExplanation.innerHTML = `
+                <strong>🏁 AT THE TARGET POINT (x = 3.00):</strong><br><br>
+                • <strong>LHL:</strong> Leads directly to <span class="highlight">6</span><br>
+                • <strong>RHL:</strong> Leads directly to <span class="highlight">6</span><br>
+                👉 Therefore, the <strong>LIMIT EXISTS and is 6</strong>.
+            `;
+
+            checklistCard.innerHTML = `
+                <h4 style="margin: 0 0 12px 0; color:#1e3a8a;">🔍 Continuity Checklist at x = 3</h4>
+                <div class="item-row">
+                    <span>1. Does Limit Exist? (LHL = RHL)</span>
+                    <span style="color:#16a34a; font-weight:bold;">✅ Yes (Value is 6)</span>
+                </div>
+                <div class="item-row">
+                    <span>2. Does exact f(3) exist?</span>
+                    <span style="color:#dc2626; font-weight:bold;">❌ No (Undefined)</span>
+                </div>
+                <div class="item-row" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
+                    <span>3. Does Limit equal f(3)?</span>
+                    <span style="color:#dc2626; font-weight:bold;">❌ No (6 ≠ Undefined)</span>
+                </div>
+                <div style="text-align: center;">
+                    <div class="status-badge badge-fail">❌ NOT CONTINUOUS</div>
+                </div>
+            `;
+        } else {
+            // MOVING TOWARD THE HOLE: Keep checklist waiting
+            if (x < 3) {
+                limitExplanation.innerHTML = `
+                    <strong>👈 Approaching from Left Side (LHL):</strong><br><br>
+                    You are looking at x values below 3. Notice in the table that as x climbs closer to 3, the outputs are scaling directly up toward <strong>6</strong>.
+                `;
+            } else {
+                limitExplanation.innerHTML = `
+                    <strong>👉 Approaching from Right Side (RHL):</strong><br><br>
+                    You are looking at x values above 3. Notice in the table that as x drops down toward 3, the outputs are descending directly down toward <strong>6</strong>.
+                `;
+            }
+
+            checklistCard.innerHTML = `
+                <h4 style="margin: 0 0 12px 0; color:#64748b;">🔍 Continuity Checklist at x = 3</h4>
+                <p style="font-size: 0.9rem; color:#64748b; margin-bottom: 15px;">
+                    Move the slider pointer completely to <strong>x = 3.00</strong> to run the ultimate continuity test sequence!
+                </p>
+                <div style="text-align: center;">
+                    <div class="status-badge badge-wait">⏳ WAITING FOR TEST POINT...</div>
+                </div>
+            `;
+        }
+    }
+
+    slider.addEventListener('input', () => {
+        const x = parseFloat(slider.value);
+        drawGraph(x);
+        updateTable(x);
+        updateExplanationAndChecklist(x);
+    });
+
+    drawGraph(2.5);
+    updateTable(2.5);
+    updateExplanationAndChecklist(2.5);
+</script>
+</body>
+</html>
