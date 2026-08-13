@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Easy Statistics: Mean Deviation & Quartile Deviation</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#07101a;color:#f5f7fa;font-family:Arial,sans-serif;overflow:hidden}
+#app{width:100vw;height:100vh;position:relative}
+.scene{display:none;position:absolute;inset:0;padding:7vh 8vw}
+.scene.active{display:flex;flex-direction:column;justify-content:center}
+h1{font-size:clamp(42px,7vw,88px);margin:0 0 20px}
+h2{font-size:clamp(32px,5vw,62px);margin:0 0 22px}
+p{font-size:clamp(21px,2.5vw,34px);line-height:1.35;max-width:1050px;color:#d6dde6}
+.big{font-size:clamp(55px,10vw,125px);font-weight:bold}
+.blue{color:#70d6ff}.yellow{color:#ffd166}.green{color:#8ce99a}.pink{color:#ff8fab}
+.cardrow{display:flex;gap:20px;flex-wrap:wrap;margin-top:25px}
+.card{background:#111d2a;border:2px solid #26384d;border-radius:18px;padding:22px;flex:1;min-width:250px}
+.card b{font-size:clamp(22px,2.4vw,34px)}
+.card p{font-size:clamp(18px,2vw,27px);margin:10px 0 0}
+.axis{height:210px;position:relative;margin:20px 0}
+.line{position:absolute;left:5%;right:5%;top:100px;height:4px;background:#607286}
+.dot{position:absolute;top:91px;width:18px;height:18px;background:white;border-radius:50%;transform:translateX(-50%)}
+.center{position:absolute;top:45px;height:120px;width:4px;transform:translateX(-50%);background:#70d6ff}
+.center:after{content:attr(data-name);position:absolute;top:-38px;left:9px;font-weight:bold;color:#70d6ff;white-space:nowrap;font-size:22px}
+.qrange{position:absolute;top:65px;height:70px;border:4px solid #ffd166;border-radius:12px}
+.formula{font-size:clamp(27px,3.5vw,48px);font-weight:bold;margin:20px 0}
+.note{color:#aebaca;font-size:clamp(18px,2vw,27px)}
+.controls{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:8px;padding:8px;background:#101923e8;border:1px solid #2b3c50;border-radius:12px;z-index:5}
+button{border:1px solid #3a4d63;background:#182536;color:white;padding:10px 15px;border-radius:8px;font-size:15px;cursor:pointer}
+button:hover{background:#24364c}
+.progress{position:fixed;left:0;bottom:0;height:5px;background:#70d6ff;z-index:6;transition:.3s}
+</style>
+</head>
+<body>
+<div id="app">
+
+<section class="scene active">
+<h1 class="big blue">DATA</h1>
+<h2>Sometimes numbers are close.<br>Sometimes they are far apart.</h2>
+<p>Today we learn how to measure <b>how spread out</b> the numbers are.</p>
+</section>
+
+<section class="scene">
+<h2>First: What is <span class="blue">Dispersion?</span></h2>
+<p>Dispersion simply means:</p>
+<div class="formula">“How much are the numbers spread out?”</div>
+<div class="axis">
+<div class="line"></div>
+<div class="dot" style="left:35%"></div><div class="dot" style="left:40%"></div>
+<div class="dot" style="left:45%"></div><div class="dot" style="left:50%"></div>
+<div class="dot" style="left:55%"></div><div class="dot" style="left:60%"></div>
+</div>
+<p class="note">So, dispersion tells us about the <b>spread</b> of the data.</p>
+</section>
+
+<section class="scene">
+<h2>What is <span class="blue">Mean Deviation?</span></h2>
+<p>Imagine every number asking:</p>
+<div class="formula">“How far am I from the center?”</div>
+<p>Mean Deviation finds the <b>average distance</b> of all the numbers from a center.</p>
+</section>
+
+<section class="scene">
+<h2>Mean Deviation from <span class="blue">Mean</span></h2>
+<div class="axis">
+<div class="line"></div>
+<div class="dot" style="left:28%"></div><div class="dot" style="left:38%"></div>
+<div class="dot" style="left:45%"></div><div class="dot" style="left:55%"></div>
+<div class="dot" style="left:63%"></div><div class="dot" style="left:72%"></div>
+<div class="center" style="left:50%" data-name="Mean"></div>
+</div>
+<div class="formula">Mean → Center</div>
+<p>We take the distance of <b>every number</b> from the Mean.</p>
+</section>
+
+<section class="scene">
+<h2>Mean Deviation from <span class="green">Median</span></h2>
+<div class="axis">
+<div class="line"></div>
+<div class="dot" style="left:28%"></div><div class="dot" style="left:38%"></div>
+<div class="dot" style="left:45%"></div><div class="dot" style="left:55%"></div>
+<div class="dot" style="left:63%"></div><div class="dot" style="left:72%"></div>
+<div class="center" style="left:50%;background:#8ce99a" data-name="Median"></div>
+</div>
+<div class="formula">Median → Center</div>
+<p>Same idea. But now we measure every number from the <b>Median</b>.</p>
+</section>
+
+<section class="scene">
+<h2>Why do we have <span class="blue">Mean</span> and <span class="green">Median</span>?</h2>
+<div class="cardrow">
+<div class="card"><b class="blue">Mean</b><p>Uses all values to find the center.</p></div>
+<div class="card"><b class="green">Median</b><p>Uses the middle value after arranging the data.</p></div>
+</div>
+<p>Very large or very small values can pull the <span class="blue">Mean</span> away. The <span class="green">Median</span> is less affected.</p>
+</section>
+
+<section class="scene">
+<h2>Now imagine this...</h2>
+<div class="axis">
+<div class="line"></div>
+<div class="dot" style="left:35%"></div><div class="dot" style="left:42%"></div>
+<div class="dot" style="left:48%"></div><div class="dot" style="left:54%"></div>
+<div class="dot" style="left:60%"></div>
+<div class="dot" style="left:90%;background:#ff8fab"></div>
+</div>
+<p>One number is <span class="pink">very far away</span>.</p>
+<p>The Mean moves toward it. The Median usually does not move much.</p>
+</section>
+
+<section class="scene">
+<h2>So what is <span class="yellow">Quartile Deviation?</span></h2>
+<p>Quartile Deviation does <b>not</b> look at every number.</p>
+<div class="formula">It looks at the middle 50% of the data.</div>
+<p>It uses two points: <b>Q₁</b> and <b>Q₃</b>.</p>
+</section>
+
+<section class="scene">
+<h2>Think of the data like a group of students</h2>
+<div class="axis">
+<div class="line"></div>
+<div class="dot" style="left:12%"></div><div class="dot" style="left:22%"></div>
+<div class="dot" style="left:33%"></div><div class="dot" style="left:42%"></div>
+<div class="dot" style="left:49%"></div><div class="dot" style="left:56%"></div>
+<div class="dot" style="left:63%"></div><div class="dot" style="left:74%"></div>
+<div class="dot" style="left:88%"></div>
+<div class="qrange" style="left:33%;width:30%"></div>
+</div>
+<p>The yellow box represents the <b>middle 50%</b>.</p>
+<p>Q₁ is the left side. Q₃ is the right side.</p>
+</section>
+
+<section class="scene">
+<h2>Quartile Deviation asks:</h2>
+<div class="formula yellow">“How wide is the middle part?”</div>
+<div class="formula">QD = (Q₃ − Q₁) ÷ 2</div>
+<p>So QD tells us how spread out the <b>middle half</b> of the data is.</p>
+</section>
+
+<section class="scene">
+<h2>Mean Deviation vs Quartile Deviation</h2>
+<div class="cardrow">
+<div class="card"><b class="blue">Mean Deviation</b><p>Looks at <b>all numbers</b>.</p><p>Measures their average distance from Mean or Median.</p></div>
+<div class="card"><b class="yellow">Quartile Deviation</b><p>Looks at the <b>middle 50%</b>.</p><p>Less affected by very large or very small values.</p></div>
+</div>
+</section>
+
+<section class="scene">
+<h2>What does <span class="pink">Coefficient</span> mean?</h2>
+<p>Coefficient simply means we want to express something as a <b>relative value</b>.</p>
+<p>Instead of only asking:</p>
+<div class="formula">“How much spread?”</div>
+<p>we can ask:</p>
+<div class="formula pink">“How much spread compared with the data?”</div>
+</section>
+
+<section class="scene">
+<h2>Coefficient of Quartile Deviation</h2>
+<div class="formula">CQD = (Q₃ − Q₁) ÷ (Q₃ + Q₁)</div>
+<p>It is based on the same Q₁ and Q₃.</p>
+<p>But now we get a <b>relative measure</b>, which helps us compare different datasets.</p>
+</section>
+
+<section class="scene">
+<h2>One simple way to remember</h2>
+<div class="cardrow">
+<div class="card"><b class="blue">MD</b><p>“How far are the numbers from the center?”</p></div>
+<div class="card"><b class="yellow">QD</b><p>“How wide is the middle 50%?”</p></div>
+<div class="card"><b class="pink">Coefficient</b><p>“How large is the spread compared with the data?”</p></div>
+</div>
+</section>
+
+<section class="scene">
+<h1 class="big green">THAT'S IT.</h1>
+<h2>Three ideas. One topic: <span class="blue">SPREAD.</span></h2>
+<p><b>Mean Deviation</b> → all values.</p>
+<p><b>Quartile Deviation</b> → middle 50%.</p>
+<p><b>Coefficient</b> → relative comparison.</p>
+</section>
+
+<div class="controls">
+<button onclick="prev()">◀</button>
+<button onclick="toggle()" id="play">▶ Play</button>
+<button onclick="next()">Next ▶</button>
+<button onclick="restart()">↺ Restart</button>
+</div>
+<div class="progress" id="progress"></div>
+</div>
+
+<script>
+const scenes=[...document.querySelectorAll('.scene')];
+let i=0,timer=null,playing=false;
+function show(n){
+ i=Math.max(0,Math.min(scenes.length-1,n));
+ scenes.forEach((s,k)=>s.classList.toggle('active',k===i));
+ document.getElementById('progress').style.width=((i+1)/scenes.length*100)+'%';
+}
+function next(){show(i+1)}
+function prev(){show(i-1)}
+function restart(){playing=false;clearInterval(timer);document.getElementById('play').textContent='▶ Play';show(0)}
+function toggle(){
+ playing=!playing;
+ document.getElementById('play').textContent=playing?'❚❚ Pause':'▶ Play';
+ clearInterval(timer);
+ if(playing) timer=setInterval(()=>{
+   if(i>=scenes.length-1){playing=false;clearInterval(timer);document.getElementById('play').textContent='▶ Play'}
+   else next();
+ },5000);
+}
+document.addEventListener('keydown',e=>{
+ if(e.key==='ArrowRight'){next()}
+ if(e.key==='ArrowLeft'){prev()}
+ if(e.key===' '){e.preventDefault();toggle()}
+});
+show(0);
+</script>
+</body>
+</html>
